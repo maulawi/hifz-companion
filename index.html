@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<title>Hifz Companion — QURRA Hifz Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%93%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep-green:#0B3026;
+  --forest:#123D31;
+  --cream:#F4EBD8;
+  --ivory:#FAF6EC;
+  --gold:#B89A5A;
+  --soft-gold:#D7C28A;
+  --charcoal:#1F211D;
+  --olive:#66685F;
+  --border-beige:#CDBD98;
+  --success:#2E6B4F;
+  --success-bg:#E7EFE8;
+  --error:#9B4D4D;
+  --error-bg:#F3E7E7;
+  --amber:#A9752C;
+  --amber-bg:#F1E4CC;
+  --font-serif:'Cormorant Garamond', serif;
+  --font-sans:'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--ivory);
+  color:var(--charcoal);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+a{color:inherit;}
+#app{max-width:900px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+h1,h2,h3{font-family:var(--font-serif);color:var(--deep-green);margin:0 0 8px;font-weight:600;}
+p{line-height:1.6;color:var(--charcoal);margin:0 0 10px;}
+.muted{color:var(--olive);font-size:13.5px;}
+.eyebrow{font-family:var(--font-sans);font-size:12px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+
+/* ---------- Nav ---------- */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;background:var(--deep-green);color:var(--ivory);
+  flex-wrap:wrap;gap:10px;
+}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--font-serif);font-size:20px;letter-spacing:0.02em;}
+.brand .mark{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--soft-gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--soft-gold);flex:0 0 auto;
+}
+.navlinks{display:flex;gap:16px;font-size:13.5px;flex-wrap:wrap;}
+.navlinks button{
+  background:none;border:none;color:var(--ivory);opacity:0.72;cursor:pointer;
+  font-family:var(--font-sans);font-size:13.5px;padding:4px 0;
+}
+.navlinks button.active{opacity:1;border-bottom:1.5px solid var(--soft-gold);}
+
+main{flex:1;padding:22px 18px 60px;}
+@media (min-width:600px){ main{padding:28px 24px 60px;} }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font-sans);font-size:14.5px;font-weight:600;
+  padding:12px 22px;border-radius:6px;cursor:pointer;border:1px solid transparent;
+  transition:opacity .15s ease;
+}
+.btn-primary{background:var(--deep-green);color:var(--ivory);}
+.btn-primary:hover{opacity:0.92;}
+.btn-secondary{background:transparent;color:var(--deep-green);border-color:var(--border-beige);}
+.btn-secondary:hover{background:var(--cream);}
+.btn-accent{background:var(--gold);color:var(--charcoal);}
+.btn-block{width:100%;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-plain{background:none;border:none;color:var(--olive);font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0;}
+.btn-sm{padding:8px 14px;font-size:13px;}
+
+/* ---------- Cards ---------- */
+.card{background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:18px;}
+.due-card{background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:16px 18px;margin-bottom:14px;}
+.due-card .dctitle{font-family:var(--font-serif);font-size:17px;color:var(--deep-green);margin-bottom:4px;}
+.due-card .dcbody{font-size:14px;color:var(--charcoal);margin-bottom:12px;}
+.due-card.empty{opacity:0.7;}
+.due-card.done{background:var(--success-bg);border-color:var(--success);}
+.due-card.done .dctitle{color:var(--success);}
+.dc-check{display:inline-flex;align-items:center;gap:6px;color:var(--success);font-size:13px;font-weight:600;}
+
+.all-done-card{
+  background:linear-gradient(160deg, var(--deep-green), var(--forest));
+  color:var(--ivory);border-radius:12px;padding:30px 24px;text-align:center;
+}
+.all-done-card h2{color:var(--ivory);}
+.all-done-card p{color:rgba(244,235,216,0.86);}
+
+/* ---------- Streak strip ---------- */
+.streak-strip{display:flex;gap:12px;margin:16px 0 22px;flex-wrap:wrap;}
+.streak-box{flex:1;min-width:110px;background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:12px 14px;text-align:center;}
+.streak-box .snum{font-family:var(--font-serif);font-size:23px;color:var(--deep-green);}
+.streak-box .slabel{font-size:11.5px;color:var(--olive);margin-top:2px;}
+
+/* ---------- Needs attention ---------- */
+.attn-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.attn-chip{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);border-radius:20px;padding:5px 12px;font-size:12.5px;}
+
+/* ---------- Forms ---------- */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;color:var(--olive);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;}
+.field select, .field input[type=number], .field input[type=text]{
+  width:100%;padding:11px 12px;border:1px solid var(--border-beige);border-radius:6px;
+  background:var(--ivory);color:var(--charcoal);font-family:var(--font-sans);font-size:14.5px;
+}
+.field textarea{
+  width:100%;padding:11px 12px;border:1px solid var(--border-beige);border-radius:6px;
+  background:var(--ivory);color:var(--charcoal);font-family:var(--font-sans);font-size:14.5px;min-height:70px;resize:vertical;
+}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.choice-group{display:flex;gap:8px;flex-wrap:wrap;}
+.choice{
+  padding:10px 16px;border:1px solid var(--border-beige);border-radius:20px;cursor:pointer;
+  font-size:13.5px;background:var(--ivory);color:var(--charcoal);
+}
+.choice.selected{background:var(--deep-green);color:var(--ivory);border-color:var(--deep-green);}
+.rating-group{display:flex;gap:8px;}
+.rating-choice{flex:1;text-align:center;padding:12px 6px;border:1px solid var(--border-beige);border-radius:8px;cursor:pointer;font-size:13.5px;background:var(--ivory);}
+.rating-choice.selected.lemah{background:var(--error-bg);border-color:var(--error);color:var(--error);font-weight:600;}
+.rating-choice.selected.sederhana{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);font-weight:600;}
+.rating-choice.selected.lancar{background:var(--success-bg);border-color:var(--success);color:var(--success);font-weight:600;}
+
+/* ---------- Modal (log entry) ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(31,33,29,0.45);display:flex;align-items:flex-end;justify-content:center;
+  z-index:50;
+}
+@media (min-width:640px){ .modal-overlay{align-items:center;} }
+.modal-sheet{
+  background:var(--ivory);border-radius:16px 16px 0 0;padding:22px 20px 28px;width:100%;max-width:520px;
+  max-height:88vh;overflow-y:auto;border-top:1px solid var(--border-beige);
+}
+@media (min-width:640px){ .modal-sheet{border-radius:14px;border:1px solid var(--border-beige);max-height:80vh;} }
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.modal-close{background:none;border:none;font-size:20px;color:var(--olive);cursor:pointer;line-height:1;}
+
+/* ---------- Setup / Rancang ---------- */
+.setup-section{margin-bottom:26px;}
+.setup-section h3{font-size:17px;margin-bottom:6px;}
+.surah-picker{max-height:280px;overflow-y:auto;border:1px solid var(--border-beige);border-radius:8px;padding:8px;background:var(--ivory);}
+.surah-picker-item{display:flex;align-items:center;gap:10px;padding:7px 8px;font-size:13.5px;border-radius:5px;}
+.surah-picker-item:hover{background:var(--cream);}
+.surah-picker-item input{flex:0 0 auto;}
+.juz-heading{font-size:11px;color:var(--olive);text-transform:uppercase;letter-spacing:0.05em;padding:8px 8px 2px;}
+
+/* ---------- Peta Hifz grid ---------- */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 18px;font-size:12px;color:var(--olive);}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.hifz-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+@media (min-width:480px){ .hifz-grid{grid-template-columns:repeat(8,1fr);} }
+@media (min-width:700px){ .hifz-grid{grid-template-columns:repeat(10,1fr);} }
+.surah-cell{
+  position:relative;aspect-ratio:1;border-radius:6px;border:1px solid var(--border-beige);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--ivory);font-size:10px;color:var(--olive);padding:2px;text-align:center;
+}
+.surah-cell .cno{font-family:var(--font-serif);font-size:13px;color:var(--charcoal);}
+.surah-cell.not_started{background:var(--ivory);}
+.surah-cell.in_progress{background:var(--soft-gold);border-color:var(--gold);}
+.surah-cell.in_progress .cno{color:var(--charcoal);}
+.surah-cell.memorised{background:var(--deep-green);border-color:var(--deep-green);}
+.surah-cell.memorised .cno{color:var(--ivory);}
+.surah-cell.needs_attention{background:var(--amber);border-color:var(--amber);}
+.surah-cell.needs_attention .cno{color:var(--ivory);}
+.juz-badge{position:absolute;top:-6px;left:-4px;background:var(--forest);color:var(--soft-gold);font-size:8px;
+  border-radius:8px;padding:1px 4px;line-height:1.4;}
+
+/* ---------- Surah detail modal ---------- */
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-beige);font-size:13.5px;}
+.detail-row:last-child{border-bottom:none;}
+
+/* ---------- Riwayat ---------- */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.entry-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-beige);gap:10px;}
+.entry-row:last-child{border-bottom:none;}
+.entry-main{font-size:14px;}
+.entry-date{font-size:11.5px;color:var(--olive);margin-bottom:2px;}
+.type-badge{font-size:10.5px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
+.type-badge.new{background:var(--soft-gold);color:var(--charcoal);}
+.type-badge.murajaah_recent{background:var(--border-beige);color:var(--charcoal);}
+.type-badge.murajaah_old{background:var(--forest);color:var(--ivory);}
+.rating-tag{font-size:11px;margin-left:6px;}
+.rating-tag.lemah{color:var(--error);}
+.rating-tag.sederhana{color:var(--amber);}
+.rating-tag.lancar{color:var(--success);}
+.empty-state{padding:34px 16px;text-align:center;color:var(--olive);}
+.back-link{background:none;border:none;color:var(--olive);font-size:13.5px;cursor:pointer;margin-bottom:14px;padding:0;}
+.back-link:hover{color:var(--charcoal);}
+footer.page-footer{padding:16px 20px 26px;text-align:center;font-size:11.5px;color:var(--olive);}
+
+[tabindex]:focus-visible, button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ===================== Reference data =====================
+// SURAHS: 114 entries. ayatPerPage is a data-driven approximation (derived
+// from each surah's share of total Quran word-count, scaled against the
+// standard 604-page Mushaf) used ONLY to translate a page-fraction pace
+// target into a soft ayat suggestion. It is never used to display or imply
+// a specific physical page number - all stored progress is Surah+Ayah.
+const SURAHS = [{"no": 1, "name": "Al-Fatihah", "totalAyah": 7, "ayatPerPage": 32.8}, {"no": 2, "name": "Al-Baqarah", "totalAyah": 286, "ayatPerPage": 5.9}, {"no": 3, "name": "Ali 'Imran", "totalAyah": 200, "ayatPerPage": 7.3}, {"no": 4, "name": "An-Nisa", "totalAyah": 176, "ayatPerPage": 6.0}, {"no": 5, "name": "Al-Ma'idah", "totalAyah": 120, "ayatPerPage": 5.4}, {"no": 6, "name": "Al-An'am", "totalAyah": 165, "ayatPerPage": 6.8}, {"no": 7, "name": "Al-A'raf", "totalAyah": 206, "ayatPerPage": 7.9}, {"no": 8, "name": "Al-Anfal", "totalAyah": 75, "ayatPerPage": 7.8}, {"no": 9, "name": "At-Tawbah", "totalAyah": 129, "ayatPerPage": 6.6}, {"no": 10, "name": "Yunus", "totalAyah": 109, "ayatPerPage": 7.6}, {"no": 11, "name": "Hud", "totalAyah": 123, "ayatPerPage": 8.1}, {"no": 12, "name": "Yusuf", "totalAyah": 111, "ayatPerPage": 8.0}, {"no": 13, "name": "Ar-Ra'd", "totalAyah": 43, "ayatPerPage": 6.3}, {"no": 14, "name": "Ibrahim", "totalAyah": 52, "ayatPerPage": 8.0}, {"no": 15, "name": "Al-Hijr", "totalAyah": 99, "ayatPerPage": 20.2}, {"no": 16, "name": "An-Nahl", "totalAyah": 128, "ayatPerPage": 8.9}, {"no": 17, "name": "Al-Isra", "totalAyah": 111, "ayatPerPage": 9.2}, {"no": 18, "name": "Al-Kahf", "totalAyah": 110, "ayatPerPage": 9.0}, {"no": 19, "name": "Maryam", "totalAyah": 98, "ayatPerPage": 13.3}, {"no": 20, "name": "Taha", "totalAyah": 135, "ayatPerPage": 13.2}, {"no": 21, "name": "Al-Anbya", "totalAyah": 112, "ayatPerPage": 12.4}, {"no": 22, "name": "Al-Hajj", "totalAyah": 78, "ayatPerPage": 7.8}, {"no": 23, "name": "Al-Mu'minun", "totalAyah": 118, "ayatPerPage": 14.7}, {"no": 24, "name": "An-Nur", "totalAyah": 64, "ayatPerPage": 6.2}, {"no": 25, "name": "Al-Furqan", "totalAyah": 77, "ayatPerPage": 11.3}, {"no": 26, "name": "Ash-Shu'ara", "totalAyah": 227, "ayatPerPage": 22.8}, {"no": 27, "name": "An-Naml", "totalAyah": 93, "ayatPerPage": 10.5}, {"no": 28, "name": "Al-Qasas", "totalAyah": 88, "ayatPerPage": 7.9}, {"no": 29, "name": "Al-'Ankabut", "totalAyah": 69, "ayatPerPage": 9.0}, {"no": 30, "name": "Ar-Rum", "totalAyah": 60, "ayatPerPage": 9.4}, {"no": 31, "name": "Luqman", "totalAyah": 34, "ayatPerPage": 7.9}, {"no": 32, "name": "As-Sajdah", "totalAyah": 30, "ayatPerPage": 10.4}, {"no": 33, "name": "Al-Ahzab", "totalAyah": 73, "ayatPerPage": 7.2}, {"no": 34, "name": "Saba", "totalAyah": 54, "ayatPerPage": 7.8}, {"no": 35, "name": "Fatir", "totalAyah": 45, "ayatPerPage": 7.3}, {"no": 36, "name": "Ya-Sin", "totalAyah": 83, "ayatPerPage": 15.0}, {"no": 37, "name": "As-Saffat", "totalAyah": 182, "ayatPerPage": 28.2}, {"no": 38, "name": "Sad", "totalAyah": 88, "ayatPerPage": 15.5}, {"no": 39, "name": "Az-Zumar", "totalAyah": 75, "ayatPerPage": 8.1}, {"no": 40, "name": "Ghafir", "totalAyah": 85, "ayatPerPage": 9.0}, {"no": 41, "name": "Fussilat", "totalAyah": 54, "ayatPerPage": 8.8}, {"no": 42, "name": "Ash-Shuraa", "totalAyah": 53, "ayatPerPage": 7.7}, {"no": 43, "name": "Az-Zukhruf", "totalAyah": 89, "ayatPerPage": 14.0}, {"no": 44, "name": "Ad-Dukhan", "totalAyah": 59, "ayatPerPage": 22.0}, {"no": 45, "name": "Al-Jathiyah", "totalAyah": 37, "ayatPerPage": 9.8}, {"no": 46, "name": "Al-Ahqaf", "totalAyah": 35, "ayatPerPage": 7.1}, {"no": 47, "name": "Muhammad", "totalAyah": 38, "ayatPerPage": 9.1}, {"no": 48, "name": "Al-Fath", "totalAyah": 29, "ayatPerPage": 6.6}, {"no": 49, "name": "Al-Hujurat", "totalAyah": 18, "ayatPerPage": 6.5}, {"no": 50, "name": "Qaf", "totalAyah": 45, "ayatPerPage": 15.7}, {"no": 51, "name": "Adh-Dhariyat", "totalAyah": 60, "ayatPerPage": 22.0}, {"no": 52, "name": "At-Tur", "totalAyah": 49, "ayatPerPage": 20.5}, {"no": 53, "name": "An-Najm", "totalAyah": 62, "ayatPerPage": 22.6}, {"no": 54, "name": "Al-Qamar", "totalAyah": 55, "ayatPerPage": 21.3}, {"no": 55, "name": "Ar-Rahman", "totalAyah": 78, "ayatPerPage": 29.9}, {"no": 56, "name": "Al-Waqi'ah", "totalAyah": 96, "ayatPerPage": 34.3}, {"no": 57, "name": "Al-Hadid", "totalAyah": 29, "ayatPerPage": 6.4}, {"no": 58, "name": "Al-Mujadila", "totalAyah": 22, "ayatPerPage": 5.8}, {"no": 59, "name": "Al-Hashr", "totalAyah": 24, "ayatPerPage": 6.8}, {"no": 60, "name": "Al-Mumtahanah", "totalAyah": 13, "ayatPerPage": 4.7}, {"no": 61, "name": "As-Saf", "totalAyah": 14, "ayatPerPage": 8.2}, {"no": 62, "name": "Al-Jumu'ah", "totalAyah": 11, "ayatPerPage": 8.1}, {"no": 63, "name": "Al-Munafiqun", "totalAyah": 11, "ayatPerPage": 7.7}, {"no": 64, "name": "At-Taghabun", "totalAyah": 18, "ayatPerPage": 9.3}, {"no": 65, "name": "At-Talaq", "totalAyah": 12, "ayatPerPage": 5.2}, {"no": 66, "name": "At-Tahrim", "totalAyah": 12, "ayatPerPage": 6.2}, {"no": 67, "name": "Al-Mulk", "totalAyah": 30, "ayatPerPage": 11.7}, {"no": 68, "name": "Al-Qalam", "totalAyah": 52, "ayatPerPage": 23.0}, {"no": 69, "name": "Al-Haqqah", "totalAyah": 52, "ayatPerPage": 27.0}, {"no": 70, "name": "Al-Ma'arij", "totalAyah": 44, "ayatPerPage": 26.9}, {"no": 71, "name": "Nuh", "totalAyah": 28, "ayatPerPage": 16.6}, {"no": 72, "name": "Al-Jinn", "totalAyah": 28, "ayatPerPage": 13.0}, {"no": 73, "name": "Al-Muzzammil", "totalAyah": 20, "ayatPerPage": 12.8}, {"no": 74, "name": "Al-Muddaththir", "totalAyah": 56, "ayatPerPage": 28.8}, {"no": 75, "name": "Al-Qiyamah", "totalAyah": 40, "ayatPerPage": 32.9}, {"no": 76, "name": "Al-Insan", "totalAyah": 31, "ayatPerPage": 16.8}, {"no": 77, "name": "Al-Mursalat", "totalAyah": 50, "ayatPerPage": 37.3}, {"no": 78, "name": "An-Naba", "totalAyah": 40, "ayatPerPage": 30.9}, {"no": 79, "name": "An-Nazi'at", "totalAyah": 46, "ayatPerPage": 34.7}, {"no": 80, "name": "Abasa", "totalAyah": 42, "ayatPerPage": 40}, {"no": 81, "name": "At-Takwir", "totalAyah": 29, "ayatPerPage": 37.9}, {"no": 82, "name": "Al-Infitar", "totalAyah": 19, "ayatPerPage": 31.9}, {"no": 83, "name": "Al-Mutaffifin", "totalAyah": 36, "ayatPerPage": 28.4}, {"no": 84, "name": "Al-Inshiqaq", "totalAyah": 25, "ayatPerPage": 31.4}, {"no": 85, "name": "Al-Buruj", "totalAyah": 22, "ayatPerPage": 26.9}, {"no": 86, "name": "At-Tariq", "totalAyah": 17, "ayatPerPage": 37.8}, {"no": 87, "name": "Al-A'la", "totalAyah": 19, "ayatPerPage": 35.3}, {"no": 88, "name": "Al-Ghashiyah", "totalAyah": 26, "ayatPerPage": 38.4}, {"no": 89, "name": "Al-Fajr", "totalAyah": 30, "ayatPerPage": 29.3}, {"no": 90, "name": "Al-Balad", "totalAyah": 20, "ayatPerPage": 33.1}, {"no": 91, "name": "Ash-Shams", "totalAyah": 15, "ayatPerPage": 37.7}, {"no": 92, "name": "Al-Layl", "totalAyah": 21, "ayatPerPage": 40}, {"no": 93, "name": "Ad-Duhaa", "totalAyah": 11, "ayatPerPage": 37.3}, {"no": 94, "name": "Ash-Sharh", "totalAyah": 8, "ayatPerPage": 40}, {"no": 95, "name": "At-Tin", "totalAyah": 8, "ayatPerPage": 28.6}, {"no": 96, "name": "Al-'Alaq", "totalAyah": 19, "ayatPerPage": 35.3}, {"no": 97, "name": "Al-Qadr", "totalAyah": 5, "ayatPerPage": 20.0}, {"no": 98, "name": "Al-Bayyinah", "totalAyah": 8, "ayatPerPage": 11.1}, {"no": 99, "name": "Az-Zalzalah", "totalAyah": 8, "ayatPerPage": 30.2}, {"no": 100, "name": "Al-'Adiyat", "totalAyah": 11, "ayatPerPage": 36.4}, {"no": 101, "name": "Al-Qari'ah", "totalAyah": 11, "ayatPerPage": 40}, {"no": 102, "name": "At-Takathur", "totalAyah": 8, "ayatPerPage": 38.8}, {"no": 103, "name": "Al-'Asr", "totalAyah": 3, "ayatPerPage": 29.1}, {"no": 104, "name": "Al-Humazah", "totalAyah": 9, "ayatPerPage": 35.9}, {"no": 105, "name": "Al-Fil", "totalAyah": 5, "ayatPerPage": 29.5}, {"no": 106, "name": "Quraysh", "totalAyah": 4, "ayatPerPage": 32.0}, {"no": 107, "name": "Al-Ma'un", "totalAyah": 7, "ayatPerPage": 38.0}, {"no": 108, "name": "Al-Kawthar", "totalAyah": 3, "ayatPerPage": 40}, {"no": 109, "name": "Al-Kafirun", "totalAyah": 6, "ayatPerPage": 31.3}, {"no": 110, "name": "An-Nasr", "totalAyah": 3, "ayatPerPage": 20.4}, {"no": 111, "name": "Al-Masad", "totalAyah": 5, "ayatPerPage": 29.5}, {"no": 112, "name": "Al-Ikhlas", "totalAyah": 4, "ayatPerPage": 36.2}, {"no": 113, "name": "Al-Falaq", "totalAyah": 5, "ayatPerPage": 29.5}, {"no": 114, "name": "An-Nas", "totalAyah": 6, "ayatPerPage": 40}];
+const JUZ_STARTS = [{"juz": 1, "surah": 1, "ayah": 1}, {"juz": 2, "surah": 2, "ayah": 142}, {"juz": 3, "surah": 2, "ayah": 253}, {"juz": 4, "surah": 3, "ayah": 93}, {"juz": 5, "surah": 4, "ayah": 24}, {"juz": 6, "surah": 4, "ayah": 148}, {"juz": 7, "surah": 5, "ayah": 82}, {"juz": 8, "surah": 6, "ayah": 111}, {"juz": 9, "surah": 7, "ayah": 88}, {"juz": 10, "surah": 8, "ayah": 41}, {"juz": 11, "surah": 9, "ayah": 93}, {"juz": 12, "surah": 11, "ayah": 6}, {"juz": 13, "surah": 12, "ayah": 53}, {"juz": 14, "surah": 15, "ayah": 1}, {"juz": 15, "surah": 17, "ayah": 1}, {"juz": 16, "surah": 18, "ayah": 75}, {"juz": 17, "surah": 21, "ayah": 1}, {"juz": 18, "surah": 23, "ayah": 1}, {"juz": 19, "surah": 25, "ayah": 21}, {"juz": 20, "surah": 27, "ayah": 56}, {"juz": 21, "surah": 29, "ayah": 46}, {"juz": 22, "surah": 33, "ayah": 31}, {"juz": 23, "surah": 36, "ayah": 28}, {"juz": 24, "surah": 39, "ayah": 32}, {"juz": 25, "surah": 41, "ayah": 47}, {"juz": 26, "surah": 46, "ayah": 1}, {"juz": 27, "surah": 51, "ayah": 31}, {"juz": 28, "surah": 58, "ayah": 1}, {"juz": 29, "surah": 67, "ayah": 1}, {"juz": 30, "surah": 78, "ayah": 1}]; // [{juz, surah, ayah}] x 30, ascending
+
+const SURAH_BY_NO = {};
+SURAHS.forEach(s => { SURAH_BY_NO[s.no] = s; });
+function getSurah(no){ return SURAH_BY_NO[no]; }
+function juzBadgesForSurah(no){ return JUZ_STARTS.filter(j => j.surah === no).map(j => j.juz); }
+
+const RATINGS = ['lemah','sederhana','lancar'];
+const RATING_LABELS = { lemah:'Lemah', sederhana:'Sederhana', lancar:'Lancar' };
+
+// ===================== Storage =====================
+const STORAGE_KEY = 'qurra_hifz_companion_v1';
+
+function defaultProgress(){
+  return {
+    schema_version: 1,
+    plan: {
+      setupDone: false,
+      direction: 'front-to-back', // 'front-to-back' | 'back-to-front'
+      positionPointer: { surah: 1, ayah: 1 },
+      paceTarget: { pageFraction: 0.5, customPages: null, customAyat: null }, // pageFraction: 0.25|0.5|1|'custom'
+      murajaahRecentWindowDays: 14,
+      murajaahCycleDays: 14
+    },
+    surahStatus: {}, // "<no>": {status, memorisedUpTo, lastRating, lastRevisedDate}
+    entries: [],     // {id,date,type,surah,ayahFrom,ayahTo,rating,note}
+    streak: { current: 0, longest: 0, lastActiveDate: null }
+  };
+}
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultProgress();
+    const p = JSON.parse(raw);
+    if(!p || p.schema_version !== 1) return defaultProgress();
+    // defensive merge in case of partial/older data
+    const d = defaultProgress();
+    p.plan = Object.assign({}, d.plan, p.plan||{});
+    p.surahStatus = p.surahStatus || {};
+    p.entries = p.entries || [];
+    p.streak = Object.assign({}, d.streak, p.streak||{});
+    return p;
+  }catch(e){ return defaultProgress(); }
+}
+function saveProgress(p){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){ /* best effort */ }
+}
+let PROGRESS = loadProgress();
+
+// ===================== Date helpers =====================
+function todayStr(){
+  const d = new Date();
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function addDaysStr(dateStr, n){
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+// ===================== Surah status helpers =====================
+function ensureSurahStatus(no){
+  if(!PROGRESS.surahStatus[no]){
+    PROGRESS.surahStatus[no] = { status:'not_started', memorisedUpTo:0, lastRating:null, lastRevisedDate:null };
+  }
+  return PROGRESS.surahStatus[no];
+}
+function getSurahStatus(no){
+  return PROGRESS.surahStatus[no] || { status:'not_started', memorisedUpTo:0, lastRating:null, lastRevisedDate:null };
+}
+function surahCellState(no){
+  const st = getSurahStatus(no);
+  if(st.status === 'not_started') return 'not_started';
+  if(st.status === 'in_progress') return 'in_progress';
+  return st.lastRating === 'lemah' ? 'needs_attention' : 'memorised';
+}
+function lastTouchDate(no){
+  let last = null;
+  PROGRESS.entries.forEach(e => { if(e.surah === no && (!last || e.date > last)) last = e.date; });
+  // A surah can also be "touched" without a log entry - e.g. marked as an
+  // already-memorised baseline during setup. Fall back to that so freshly
+  // imported material isn't immediately treated as overdue for Murajaah Lama.
+  const st = getSurahStatus(no);
+  if(st.lastRevisedDate && (!last || st.lastRevisedDate > last)) last = st.lastRevisedDate;
+  return last;
+}
+
+// ===================== Traversal order =====================
+function traversalOrder(){
+  const base = SURAHS.map(s => s.no);
+  return PROGRESS.plan.direction === 'back-to-front' ? base.slice().reverse() : base;
+}
+function nextSurahNo(current){
+  const order = traversalOrder();
+  const idx = order.indexOf(current);
+  return order[(idx + 1) % order.length];
+}
+
+// ===================== New-Hifz suggestion =====================
+function computeSuggestedNew(){
+  const pos = PROGRESS.plan.positionPointer;
+  const surah = getSurah(pos.surah);
+  if(!surah) return null;
+  if(pos.ayah > surah.totalAyah) return null; // whole Quran done (edge case)
+  const pace = PROGRESS.plan.paceTarget;
+  let targetAyat;
+  if(pace.pageFraction === 'custom' && pace.customAyat){
+    targetAyat = pace.customAyat;
+  } else if(pace.pageFraction === 'custom'){
+    targetAyat = Math.round((pace.customPages||1) * surah.ayatPerPage);
+  } else {
+    targetAyat = Math.round((pace.pageFraction||0.5) * surah.ayatPerPage);
+  }
+  targetAyat = Math.max(1, targetAyat || 1);
+  const ayahToSuggested = Math.min(pos.ayah + targetAyat - 1, surah.totalAyah);
+  return { surah: pos.surah, ayahFrom: pos.ayah, ayahToSuggested };
+}
+
+// ===================== Murajaah due-lists =====================
+function murajaahBaruDue(){
+  const cutoff = addDaysStr(todayStr(), -(PROGRESS.plan.murajaahRecentWindowDays||14));
+  const touched = new Set();
+  PROGRESS.entries.forEach(e => { if(e.type === 'new' && e.date >= cutoff) touched.add(e.surah); });
+  const doneToday = new Set(PROGRESS.entries.filter(e => e.type==='murajaah_recent' && e.date===todayStr()).map(e=>e.surah));
+  return [...touched].filter(s => !doneToday.has(s)).sort((a,b)=>a-b);
+}
+
+function murajaahLamaDue(){
+  const cutoff = addDaysStr(todayStr(), -(PROGRESS.plan.murajaahRecentWindowDays||14));
+  const doneToday = new Set(PROGRESS.entries.filter(e => e.type==='murajaah_old' && e.date===todayStr()).map(e=>e.surah));
+
+  let eligible = SURAHS.filter(s => {
+    const st = getSurahStatus(s.no);
+    if(st.status !== 'memorised') return false;
+    if(doneToday.has(s.no)) return false;
+    const touch = lastTouchDate(s.no);
+    if(touch && touch >= cutoff) return false; // still in the "recent" window - handled by Murajaah Baru
+    return true;
+  });
+
+  eligible.sort((a,b) => {
+    const sa = getSurahStatus(a.no), sb = getSurahStatus(b.no);
+    const aWeak = sa.lastRating === 'lemah', bWeak = sb.lastRating === 'lemah';
+    if(aWeak !== bWeak) return aWeak ? -1 : 1;
+    const da = sa.lastRevisedDate || '0000-00-00', db = sb.lastRevisedDate || '0000-00-00';
+    return da < db ? -1 : (da > db ? 1 : 0);
+  });
+
+  const totalMemorisedAyat = SURAHS.reduce((sum,s) => sum + (getSurahStatus(s.no).status==='memorised' ? s.totalAyah : 0), 0);
+  const cycleDays = PROGRESS.plan.murajaahCycleDays || 14;
+  const quota = Math.max(1, Math.round(totalMemorisedAyat / cycleDays));
+  const coveredToday = PROGRESS.entries
+    .filter(e => e.type==='murajaah_old' && e.date===todayStr())
+    .reduce((sum,e) => sum + (getSurah(e.surah) ? getSurah(e.surah).totalAyah : 0), 0);
+  const remainingQuota = Math.max(0, quota - coveredToday);
+  if(remainingQuota <= 0) return [];
+
+  let acc = 0; const due = [];
+  for(const s of eligible){
+    due.push(s.no); acc += s.totalAyah;
+    if(acc >= remainingQuota) break;
+  }
+  return due;
+}
+
+// ===================== Logging =====================
+function logEntry({type, surah, ayahFrom, ayahTo, rating, note}){
+  const date = todayStr();
+  const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2), date, type, surah, ayahFrom, ayahTo, rating, note: note||'' };
+  PROGRESS.entries.push(entry);
+
+  const st = ensureSurahStatus(surah);
+  st.lastRating = rating;
+  st.lastRevisedDate = date;
+
+  if(type === 'new'){
+    const surahRef = getSurah(surah);
+    st.memorisedUpTo = Math.max(st.memorisedUpTo, ayahTo);
+    st.status = st.memorisedUpTo >= surahRef.totalAyah ? 'memorised' : 'in_progress';
+    if(surah === PROGRESS.plan.positionPointer.surah){
+      if(st.status === 'memorised'){
+        let next = nextSurahNo(surah), guard = 0;
+        while(getSurahStatus(next).status === 'memorised' && guard < 114){ next = nextSurahNo(next); guard++; }
+        const nextSt = getSurahStatus(next);
+        PROGRESS.plan.positionPointer = { surah: next, ayah: (nextSt.memorisedUpTo||0) + 1 };
+      } else {
+        PROGRESS.plan.positionPointer = { surah: surah, ayah: st.memorisedUpTo + 1 };
+      }
+    }
+  }
+
+  updateStreak(date);
+  saveProgress(PROGRESS);
+  return entry;
+}
+
+function updateStreak(date){
+  const s = PROGRESS.streak;
+  if(s.lastActiveDate === date) return;
+  const yesterday = addDaysStr(date, -1);
+  s.current = (s.lastActiveDate === yesterday) ? s.current + 1 : 1;
+  s.longest = Math.max(s.longest, s.current);
+  s.lastActiveDate = date;
+}
+
+// ===================== Today completion =====================
+function isTodayComplete(){
+  if(!PROGRESS.plan.setupDone) return false;
+  const t = todayStr();
+  const newDue = computeSuggestedNew();
+  const newLoggedToday = PROGRESS.entries.some(e => e.date===t && e.type==='new');
+  const newOk = !newDue || newLoggedToday;
+  return newOk && murajaahBaruDue().length===0 && murajaahLamaDue().length===0;
+}
+
+// ===================== Whole-Quran progress =====================
+function totalMemorisedAyatCount(){
+  return SURAHS.reduce((sum,s) => sum + (getSurahStatus(s.no).status==='memorised' ? s.totalAyah : (getSurahStatus(s.no).memorisedUpTo||0)), 0);
+}
+function totalAyatInQuran(){ return SURAHS.reduce((sum,s)=>sum+s.totalAyah,0); }
+function percentMemorised(){ return Math.round((totalMemorisedAyatCount() / totalAyatInQuran()) * 100); }
+function needsAttentionList(){
+  return SURAHS.filter(s => getSurahStatus(s.no).status==='memorised' && getSurahStatus(s.no).lastRating==='lemah');
+}
+
+
+// ===================== State =====================
+let STATE = {
+  screen: 'utama', // utama | rancang | petahifz | riwayat
+  modal: null,     // {type:'log', logType:'new'|'murajaah', prefill:{...}} | {type:'surah', surahNo}
+  riwayatFilter: 'all', // all | new | murajaah_recent | murajaah_old
+  rancangForm: null // transient in-progress Rancang form state - see initRancangForm()
+};
+
+function escapeHtml(s){
+  return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const app = document.getElementById('app');
+
+function render(){
+  app.innerHTML = navHtml() + '<main>' + screenHtml() + '</main>' + footerHtml() + modalHtml();
+  bindEvents();
+}
+function go(screen){
+  STATE.screen = screen; STATE.modal = null;
+  if(screen === 'rancang') STATE.rancangForm = null; // fresh form each time we navigate here
+  render(); window.scrollTo(0,0);
+}
+function openModal(modal){ STATE.modal = modal; render(); }
+function closeModal(){ STATE.modal = null; render(); }
+
+// ===================== Nav / footer =====================
+function navHtml(){
+  const items = [
+    {key:'utama', label:'Utama'},
+    {key:'rancang', label:'Rancang'},
+    {key:'petahifz', label:'Peta Hifz'},
+    {key:'riwayat', label:'Riwayat'},
+  ];
+  return `
+  <div class="nav">
+    <div class="brand"><span class="mark">Q</span> Hifz Companion</div>
+    <div class="navlinks">
+      ${items.map(it => `<button data-nav="${it.key}" class="${STATE.screen===it.key?'active':''}">${it.label}</button>`).join('')}
+    </div>
+  </div>`;
+}
+function footerHtml(){
+  return `<footer class="page-footer">Hifz Lab &mdash; Hifz Companion. Data disimpan pada peranti anda sahaja.</footer>`;
+}
+
+function screenHtml(){
+  switch(STATE.screen){
+    case 'rancang': return rancangHtml();
+    case 'petahifz': return petaHifzHtml();
+    case 'riwayat': return riwayatHtml();
+    default: return utamaHtml();
+  }
+}
+
+// ===================== UTAMA (Home) =====================
+function utamaHtml(){
+  if(!PROGRESS.plan.setupDone){
+    return `
+    <h2>Selamat Datang</h2>
+    <div class="card">
+      <p>Sebelum bermula, sediakan rancangan hafalan anda &mdash; titik permulaan, sasaran hafalan baru, dan kitaran murajaah.</p>
+      <button class="btn btn-primary" data-nav="rancang">Sediakan Rancangan</button>
+    </div>`;
+  }
+
+  const todayDone = isTodayComplete();
+  const s = PROGRESS.streak;
+  const pct = percentMemorised();
+  const attn = needsAttentionList();
+
+  let body = '';
+  if(todayDone){
+    body = `
+    <div class="all-done-card">
+      <h2>Hari Ini Selesai</h2>
+      <p>Hafalan baru dan murajaah hari ini telah dicatat. Teruskan esok.</p>
+    </div>`;
+  } else {
+    body = newCardHtml() + murajaahBaruCardHtml() + murajaahLamaCardHtml();
+  }
+
+  return `
+  <h2>Utama</h2>
+  <div class="streak-strip">
+    <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">Hari Berterusan</div></div>
+    <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">Al-Quran Dihafal</div></div>
+    <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">Rekod Terbaik</div></div>
+  </div>
+  ${body}
+  ${attn.length ? `
+  <div style="margin-top:22px;">
+    <h3 style="font-size:15px;">Perlu Perhatian</h3>
+    <div class="attn-list">${attn.map(s=>`<span class="attn-chip">${escapeHtml(s.name)}</span>`).join('')}</div>
+  </div>` : ''}
+  `;
+}
+
+function newCardHtml(){
+  const sug = computeSuggestedNew();
+  const doneToday = PROGRESS.entries.some(e => e.date===todayStr() && e.type==='new');
+  if(!sug){
+    return `<div class="due-card empty"><div class="dctitle">Hafalan Baru</div><div class="dcbody">Al-Quran telah selesai dihafal sepenuhnya.</div></div>`;
+  }
+  const surah = getSurah(sug.surah);
+  if(doneToday){
+    return `<div class="due-card done"><div class="dctitle">Hafalan Baru Hari Ini</div><div class="dc-check">&#10003; Sudah dicatat hari ini</div></div>`;
+  }
+  return `
+  <div class="due-card">
+    <div class="dctitle">Hafalan Baru Hari Ini</div>
+    <div class="dcbody">Sambung dari <strong>${escapeHtml(surah.name)}, ayat ${sug.ayahFrom}</strong><br><span class="muted">Cadangan: hingga ayat ${sug.ayahToSuggested}</span></div>
+    <button class="btn btn-accent btn-sm" data-action="log-new">Log Hafalan Baru</button>
+  </div>`;
+}
+
+function murajaahBaruCardHtml(){
+  const due = murajaahBaruDue();
+  if(due.length === 0){
+    return `<div class="due-card empty"><div class="dctitle">Murajaah Baru Hari Ini</div><div class="dcbody muted">Tiada bahagian baru untuk diulang kaji sekarang.</div></div>`;
+  }
+  const names = due.map(no => getSurah(no).name).join(', ');
+  return `
+  <div class="due-card">
+    <div class="dctitle">Murajaah Baru Hari Ini</div>
+    <div class="dcbody">${escapeHtml(names)}</div>
+    <button class="btn btn-accent btn-sm" data-action="log-murajaah-recent" data-surah="${due[0]}">Log Murajaah Baru</button>
+  </div>`;
+}
+
+function murajaahLamaCardHtml(){
+  const due = murajaahLamaDue();
+  if(due.length === 0){
+    return `<div class="due-card empty"><div class="dctitle">Murajaah Lama Hari Ini</div><div class="dcbody muted">Belum ada bahagian dalam kitaran murajaah lama.</div></div>`;
+  }
+  const names = due.map(no => getSurah(no).name).join(', ');
+  return `
+  <div class="due-card">
+    <div class="dctitle">Murajaah Lama Hari Ini</div>
+    <div class="dcbody">${escapeHtml(names)}</div>
+    <button class="btn btn-accent btn-sm" data-action="log-murajaah-old" data-surah="${due[0]}">Log Murajaah Lama</button>
+  </div>`;
+}
+
+// ===================== RANCANG (Plan Setup) =====================
+function initRancangForm(){
+  const baseline = new Set();
+  SURAHS.forEach(s => { if(getSurahStatus(s.no).status === 'memorised') baseline.add(s.no); });
+  STATE.rancangForm = {
+    baseline,
+    direction: PROGRESS.plan.direction,
+    pageFraction: PROGRESS.plan.paceTarget.pageFraction,
+    customPages: PROGRESS.plan.paceTarget.customPages,
+    customAyat: PROGRESS.plan.paceTarget.customAyat,
+    recentWindow: PROGRESS.plan.murajaahRecentWindowDays,
+    cycleDays: PROGRESS.plan.murajaahCycleDays
+  };
+}
+
+function rancangHtml(){
+  if(!STATE.rancangForm) initRancangForm();
+  const f = STATE.rancangForm;
+  const isCustom = f.pageFraction === 'custom';
+
+  const juzOfSurah = {};
+  SURAHS.forEach(s => {
+    const starts = juzBadgesForSurah(s.no);
+    juzOfSurah[s.no] = starts.length ? Math.min(...starts) : (juzOfSurah[s.no-1]||1);
+  });
+
+  let pickerHtml = '';
+  let currentJuz = null;
+  SURAHS.forEach(s => {
+    const j = juzOfSurah[s.no];
+    if(j !== currentJuz){ pickerHtml += `<div class="juz-heading">Juzuk ${j}</div>`; currentJuz = j; }
+    const checked = f.baseline.has(s.no) ? 'checked' : '';
+    pickerHtml += `<label class="surah-picker-item"><input type="checkbox" data-baseline-surah="${s.no}" ${checked}> ${escapeHtml(s.name)} <span class="muted">(${s.totalAyah} ayat)</span></label>`;
+  });
+
+  return `
+  <h2>Rancang</h2>
+  <p class="muted">Tetapan ini boleh dikemaskini pada bila-bila masa tanpa menjejaskan rekod anda.</p>
+
+  <div class="setup-section">
+    <h3>Sudah Dihafal (Titik Permulaan)</h3>
+    <p class="muted">Tandakan surah yang telah anda hafal sebelum ini. Lain-lain akan bermula dari kosong.</p>
+    <div class="surah-picker">${pickerHtml}</div>
+  </div>
+
+  <div class="setup-section">
+    <h3>Arah Hafalan</h3>
+    <div class="choice-group">
+      <div class="choice ${f.direction==='front-to-back'?'selected':''}" data-set-direction="front-to-back">Depan ke Belakang</div>
+      <div class="choice ${f.direction==='back-to-front'?'selected':''}" data-set-direction="back-to-front">Belakang ke Depan</div>
+    </div>
+  </div>
+
+  <div class="setup-section">
+    <h3>Sasaran Hafalan Baru</h3>
+    <div class="choice-group">
+      <div class="choice ${f.pageFraction===0.25?'selected':''}" data-set-pace="0.25">&frac14; Halaman</div>
+      <div class="choice ${f.pageFraction===0.5?'selected':''}" data-set-pace="0.5">&frac12; Halaman</div>
+      <div class="choice ${f.pageFraction===1?'selected':''}" data-set-pace="1">1 Halaman</div>
+      <div class="choice ${isCustom?'selected':''}" data-set-pace="custom">Custom</div>
+    </div>
+    ${isCustom ? `
+    <div class="row2" style="margin-top:12px;">
+      <div class="field">
+        <label>Halaman Custom</label>
+        <input type="number" min="0.1" step="0.1" id="customPagesInput" data-form-field="customPages" value="${f.customPages||''}" placeholder="cth: 1.5">
+      </div>
+      <div class="field">
+        <label>Atau Bilangan Ayat Terus</label>
+        <input type="number" min="1" step="1" id="customAyatInput" data-form-field="customAyat" value="${f.customAyat||''}" placeholder="cth: 10">
+      </div>
+    </div>` : ''}
+  </div>
+
+  <div class="setup-section">
+    <h3>Tetapan Murajaah</h3>
+    <div class="row2">
+      <div class="field">
+        <label>Tempoh "Baru" (hari)</label>
+        <input type="number" min="1" id="recentWindowInput" data-form-field="recentWindow" value="${f.recentWindow}">
+      </div>
+      <div class="field">
+        <label>Kitaran Murajaah Lama (hari)</label>
+        <input type="number" min="1" id="cycleDaysInput" data-form-field="cycleDays" value="${f.cycleDays}">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-block" data-action="save-rancang">Simpan Rancangan</button>
+  `;
+}
+
+// ===================== PETA HIFZ =====================
+function petaHifzHtml(){
+  const cells = SURAHS.map(s => {
+    const state = surahCellState(s.no);
+    const badges = juzBadgesForSurah(s.no);
+    return `<div class="surah-cell ${state}" data-surah-detail="${s.no}">
+      ${badges.length ? `<span class="juz-badge">J${badges[0]}</span>` : ''}
+      <div class="cno">${s.no}</div>
+    </div>`;
+  }).join('');
+  return `
+  <h2>Peta Hifz</h2>
+  <p class="muted">Ketik mana-mana surah untuk lihat butiran.</p>
+  <div class="legend">
+    <span><span class="legend-dot" style="background:var(--ivory);border:1px solid var(--border-beige);"></span>Belum Bermula</span>
+    <span><span class="legend-dot" style="background:var(--soft-gold);"></span>Sedang Dihafal</span>
+    <span><span class="legend-dot" style="background:var(--deep-green);"></span>Dihafal</span>
+    <span><span class="legend-dot" style="background:var(--amber);"></span>Perlu Perhatian</span>
+  </div>
+  <div class="hifz-grid">${cells}</div>
+  `;
+}
+
+// ===================== RIWAYAT =====================
+function riwayatHtml(){
+  const filters = [
+    {key:'all', label:'Semua'},
+    {key:'new', label:'Hafalan Baru'},
+    {key:'murajaah_recent', label:'Murajaah Baru'},
+    {key:'murajaah_old', label:'Murajaah Lama'},
+  ];
+  const filtered = PROGRESS.entries
+    .filter(e => STATE.riwayatFilter==='all' || e.type===STATE.riwayatFilter)
+    .slice().sort((a,b) => b.date.localeCompare(a.date) || (b.id>a.id?1:-1));
+
+  const typeLabel = {new:'Hafalan Baru', murajaah_recent:'Murajaah Baru', murajaah_old:'Murajaah Lama'};
+
+  const rows = filtered.map(e => `
+    <div class="entry-row">
+      <div class="entry-main">
+        <div class="entry-date">${e.date}</div>
+        <div><strong>${escapeHtml(getSurah(e.surah)?.name||('Surah '+e.surah))}</strong> ayat ${e.ayahFrom}&ndash;${e.ayahTo}
+          <span class="rating-tag ${e.rating}">${RATING_LABELS[e.rating]||''}</span></div>
+        ${e.note ? `<div class="muted">${escapeHtml(e.note)}</div>` : ''}
+      </div>
+      <div class="type-badge ${e.type}">${typeLabel[e.type]||e.type}</div>
+    </div>`).join('');
+
+  return `
+  <h2>Riwayat</h2>
+  <div class="filter-row">
+    ${filters.map(f => `<div class="choice ${STATE.riwayatFilter===f.key?'selected':''}" data-set-filter="${f.key}">${f.label}</div>`).join('')}
+  </div>
+  ${filtered.length ? `<div class="card">${rows}</div>` : `<div class="empty-state">Tiada rekod lagi.</div>`}
+  `;
+}
+
+
+// ===================== Modal =====================
+function modalHtml(){
+  if(!STATE.modal) return '';
+  if(STATE.modal.type === 'log') return logModalHtml();
+  if(STATE.modal.type === 'surah') return surahDetailModalHtml();
+  return '';
+}
+
+function surahSelectOptions(selected){
+  return SURAHS.map(s => `<option value="${s.no}" ${s.no===selected?'selected':''}>${s.no}. ${escapeHtml(s.name)} (${s.totalAyah} ayat)</option>`).join('');
+}
+
+function logModalHtml(){
+  const m = STATE.modal;
+  const isNew = m.logType === 'new';
+  const surahNo = (m.surah !== undefined) ? m.surah : m.prefill.surah;
+  const ayahFrom = (m.ayahFrom !== undefined) ? m.ayahFrom : m.prefill.ayahFrom;
+  const ayahTo = (m.ayahTo !== undefined) ? m.ayahTo : m.prefill.ayahTo;
+  const surah = getSurah(surahNo);
+  const title = isNew ? 'Log Hafalan Baru' : 'Log Murajaah';
+
+  return `
+  <div class="modal-overlay" data-close-modal="1">
+    <div class="modal-sheet" data-stop-propagation="1">
+      <div class="modal-header">
+        <h3 style="margin:0;">${title}</h3>
+        <button class="modal-close" data-action="close-modal">&times;</button>
+      </div>
+
+      ${!isNew ? `
+      <div class="field">
+        <label>Jenis Murajaah</label>
+        <div class="choice-group">
+          <div class="choice ${m.logType==='murajaah_recent'?'selected':''}" data-set-logtype="murajaah_recent">Baru (Recent)</div>
+          <div class="choice ${m.logType==='murajaah_old'?'selected':''}" data-set-logtype="murajaah_old">Lama (Cycling)</div>
+        </div>
+      </div>` : ''}
+
+      <div class="field">
+        <label>Surah</label>
+        <select id="logSurahSelect" data-modal-field="surah">${surahSelectOptions(surahNo)}</select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Ayat Dari</label>
+          <input type="number" min="1" max="${surah.totalAyah}" id="logAyahFrom" data-modal-field="ayahFrom" value="${ayahFrom}">
+        </div>
+        <div class="field">
+          <label>Ayat Hingga</label>
+          <input type="number" min="1" max="${surah.totalAyah}" id="logAyahTo" data-modal-field="ayahTo" value="${ayahTo}">
+        </div>
+      </div>
+      <div class="field">
+        <label>Kualiti</label>
+        <div class="rating-group">
+          ${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${RATING_LABELS[r]}</div>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label>Nota (Pilihan)</label>
+        <textarea id="logNote" data-modal-field="note" placeholder="cth: keliru dengan ayat lain...">${escapeHtml(m.note||'')}</textarea>
+      </div>
+      <button class="btn btn-primary btn-block" data-action="submit-log">Simpan</button>
+    </div>
+  </div>`;
+}
+
+function surahDetailModalHtml(){
+  const no = STATE.modal.surahNo;
+  const s = getSurah(no);
+  const st = getSurahStatus(no);
+  const statusLabel = {not_started:'Belum Bermula', in_progress:'Sedang Dihafal', memorised:'Dihafal'}[st.status] || st.status;
+  const history = PROGRESS.entries.filter(e => e.surah===no).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  const typeLabel = {new:'Hafalan Baru', murajaah_recent:'Murajaah Baru', murajaah_old:'Murajaah Lama'};
+
+  return `
+  <div class="modal-overlay" data-close-modal="1">
+    <div class="modal-sheet" data-stop-propagation="1">
+      <div class="modal-header">
+        <h3 style="margin:0;">${escapeHtml(s.name)}</h3>
+        <button class="modal-close" data-action="close-modal">&times;</button>
+      </div>
+      <div class="detail-row"><span class="muted">Jumlah Ayat</span><span>${s.totalAyah}</span></div>
+      <div class="detail-row"><span class="muted">Status</span><span>${statusLabel}</span></div>
+      <div class="detail-row"><span class="muted">Dihafal Hingga Ayat</span><span>${st.memorisedUpTo||0}</span></div>
+      <div class="detail-row"><span class="muted">Kualiti Terakhir</span><span>${st.lastRating?RATING_LABELS[st.lastRating]:'&mdash;'}</span></div>
+      <div class="detail-row"><span class="muted">Tarikh Terakhir</span><span>${st.lastRevisedDate||'&mdash;'}</span></div>
+      ${history.length ? `
+      <h3 style="font-size:14px;margin-top:16px;">Sejarah Terkini</h3>
+      ${history.map(e => `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>ayat ${e.ayahFrom}&ndash;${e.ayahTo} <span class="rating-tag ${e.rating}">${RATING_LABELS[e.rating]}</span></div><div class="type-badge ${e.type}">${typeLabel[e.type]}</div></div>`).join('')}
+      ` : '<p class="muted" style="margin-top:14px;">Tiada rekod lagi untuk surah ini.</p>'}
+    </div>
+  </div>`;
+}
+
+// ===================== Events =====================
+function bindEvents(){
+  app.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => go(el.getAttribute('data-nav'))));
+
+  // Home quick-log buttons
+  const newBtn = app.querySelector('[data-action="log-new"]');
+  if(newBtn) newBtn.addEventListener('click', () => {
+    const sug = computeSuggestedNew();
+    openModal({ type:'log', logType:'new', prefill:{ surah:sug.surah, ayahFrom:sug.ayahFrom, ayahTo:sug.ayahToSuggested }, rating:null, note:'' });
+  });
+  const recentBtn = app.querySelector('[data-action="log-murajaah-recent"]');
+  if(recentBtn) recentBtn.addEventListener('click', () => {
+    const surahNo = parseInt(recentBtn.getAttribute('data-surah'),10);
+    const surah = getSurah(surahNo);
+    openModal({ type:'log', logType:'murajaah_recent', prefill:{ surah:surahNo, ayahFrom:1, ayahTo:surah.totalAyah }, rating:null, note:'' });
+  });
+  const oldBtn = app.querySelector('[data-action="log-murajaah-old"]');
+  if(oldBtn) oldBtn.addEventListener('click', () => {
+    const surahNo = parseInt(oldBtn.getAttribute('data-surah'),10);
+    const surah = getSurah(surahNo);
+    openModal({ type:'log', logType:'murajaah_old', prefill:{ surah:surahNo, ayahFrom:1, ayahTo:surah.totalAyah }, rating:null, note:'' });
+  });
+
+  // Rancang interactions - all write into the transient STATE.rancangForm,
+  // never directly into PROGRESS, so nothing is lost across the re-renders
+  // that clicking a choice button triggers. Only "Simpan Rancangan" commits.
+  if(!STATE.rancangForm && STATE.screen === 'rancang') initRancangForm();
+  app.querySelectorAll('[data-baseline-surah]').forEach(el => el.addEventListener('change', () => {
+    const no = parseInt(el.getAttribute('data-baseline-surah'),10);
+    if(el.checked) STATE.rancangForm.baseline.add(no); else STATE.rancangForm.baseline.delete(no);
+    // no render() here - checkbox already reflects its own state visually, and
+    // re-rendering on every checkbox click would be needlessly disruptive
+  }));
+  app.querySelectorAll('[data-form-field]').forEach(el => el.addEventListener('input', () => {
+    const field = el.getAttribute('data-form-field');
+    STATE.rancangForm[field] = el.value ? parseFloat(el.value) : null;
+  }));
+  app.querySelectorAll('[data-set-direction]').forEach(el => el.addEventListener('click', () => {
+    if(!STATE.rancangForm) initRancangForm();
+    STATE.rancangForm.direction = el.getAttribute('data-set-direction'); render();
+  }));
+  app.querySelectorAll('[data-set-pace]').forEach(el => el.addEventListener('click', () => {
+    if(!STATE.rancangForm) initRancangForm();
+    const v = el.getAttribute('data-set-pace');
+    STATE.rancangForm.pageFraction = (v==='custom') ? 'custom' : parseFloat(v);
+    render();
+  }));
+  const saveBtn = app.querySelector('[data-action="save-rancang"]');
+  if(saveBtn) saveBtn.addEventListener('click', () => {
+    const f = STATE.rancangForm;
+    // sync any not-yet-"changed" text-input values (e.g. user typed but tabbed
+    // away without blurring) directly from the DOM as a final safety read
+    ['customPages','customAyat','recentWindow','cycleDays'].forEach(field => {
+      const el = app.querySelector(`[data-form-field="${field}"]`);
+      if(el) f[field] = el.value ? parseFloat(el.value) : null;
+    });
+
+    // commit baseline surahs
+    SURAHS.forEach(s => {
+      const wasMemorised = getSurahStatus(s.no).status === 'memorised';
+      const nowChecked = f.baseline.has(s.no);
+      if(nowChecked && !wasMemorised){
+        const st = ensureSurahStatus(s.no);
+        st.status = 'memorised'; st.memorisedUpTo = s.totalAyah;
+        if(!st.lastRevisedDate){ st.lastRating = st.lastRating || 'sederhana'; st.lastRevisedDate = todayStr(); }
+      } else if(!nowChecked && wasMemorised && !PROGRESS.entries.some(e => e.surah===s.no)){
+        // unchecked and no real log history behind it - revert to not_started
+        delete PROGRESS.surahStatus[s.no];
+      }
+    });
+
+    PROGRESS.plan.direction = f.direction;
+    PROGRESS.plan.paceTarget.pageFraction = f.pageFraction;
+    PROGRESS.plan.paceTarget.customPages = f.pageFraction==='custom' ? f.customPages : null;
+    PROGRESS.plan.paceTarget.customAyat = f.pageFraction==='custom' ? f.customAyat : null;
+    PROGRESS.plan.murajaahRecentWindowDays = Math.max(1, f.recentWindow || 14);
+    PROGRESS.plan.murajaahCycleDays = Math.max(1, f.cycleDays || 14);
+
+    // (Re)compute the position pointer: first non-memorised surah in traversal order
+    let order = traversalOrder();
+    let next = order.find(no => getSurahStatus(no).status !== 'memorised');
+    if(next === undefined) next = order[order.length-1];
+    const nextSt = getSurahStatus(next);
+    PROGRESS.plan.positionPointer = { surah: next, ayah: (nextSt.memorisedUpTo||0) + 1 };
+
+    PROGRESS.plan.setupDone = true;
+    saveProgress(PROGRESS);
+    STATE.rancangForm = null;
+    go('utama');
+  });
+
+  // Peta Hifz cells
+  app.querySelectorAll('[data-surah-detail]').forEach(el => el.addEventListener('click', () => {
+    openModal({ type:'surah', surahNo: parseInt(el.getAttribute('data-surah-detail'),10) });
+  }));
+
+  // Riwayat filters
+  app.querySelectorAll('[data-set-filter]').forEach(el => el.addEventListener('click', () => {
+    STATE.riwayatFilter = el.getAttribute('data-set-filter'); render();
+  }));
+
+  // Modal-internal events
+  if(STATE.modal){
+    const overlay = app.querySelector('[data-close-modal]');
+    if(overlay) overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+    const sheet = app.querySelector('[data-stop-propagation]');
+    if(sheet) sheet.addEventListener('click', (e) => e.stopPropagation());
+    const closeBtn = app.querySelector('[data-action="close-modal"]');
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    app.querySelectorAll('[data-set-logtype]').forEach(el => el.addEventListener('click', () => {
+      STATE.modal.logType = el.getAttribute('data-set-logtype'); render();
+    }));
+    app.querySelectorAll('[data-set-rating]').forEach(el => el.addEventListener('click', () => {
+      STATE.modal.rating = el.getAttribute('data-set-rating'); render();
+    }));
+    app.querySelectorAll('[data-modal-field]').forEach(el => {
+      const evt = (el.tagName==='SELECT') ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        const field = el.getAttribute('data-modal-field');
+        STATE.modal[field] = (field==='surah'||field==='ayahFrom'||field==='ayahTo') ? parseInt(el.value,10) : el.value;
+      });
+    });
+
+    const submitBtn = app.querySelector('[data-action="submit-log"]');
+    if(submitBtn) submitBtn.addEventListener('click', () => {
+      if(!STATE.modal.rating){ alert('Sila pilih kualiti (Lemah / Sederhana / Lancar).'); return; }
+      // final safety read directly from the DOM, in case a field changed but
+      // never fired its own change event before this click
+      const surahEl = document.getElementById('logSurahSelect');
+      const fromEl = document.getElementById('logAyahFrom');
+      const toEl = document.getElementById('logAyahTo');
+      const noteEl = document.getElementById('logNote');
+      const surah = parseInt((surahEl?surahEl.value:STATE.modal.surah||STATE.modal.prefill.surah),10);
+      const ayahFrom = parseInt((fromEl?fromEl.value:STATE.modal.ayahFrom||STATE.modal.prefill.ayahFrom),10);
+      const ayahTo = parseInt((toEl?toEl.value:STATE.modal.ayahTo||STATE.modal.prefill.ayahTo),10);
+      const note = noteEl ? noteEl.value : (STATE.modal.note||'');
+      if(!ayahFrom || !ayahTo || ayahTo < ayahFrom){ alert('Sila semak julat ayat.'); return; }
+      const surahRef = getSurah(surah);
+      if(ayahFrom < 1 || ayahTo > surahRef.totalAyah){ alert('Julat ayat di luar bilangan ayat surah ini.'); return; }
+      logEntry({ type: STATE.modal.logType, surah, ayahFrom, ayahTo, rating: STATE.modal.rating, note });
+      closeModal();
+    });
+  }
+}
+
+// ===================== Init =====================
+render();
+
+</script>
+</body>
+</html>
