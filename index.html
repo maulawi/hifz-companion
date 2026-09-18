@@ -556,6 +556,125 @@ function juzPerDayForCycle(totalJuz, cycleDays){
   return Math.ceil(totalJuz / Math.max(1, cycleDays));
 }
 
+// ===================== Calendar export (.ics) =====================
+// New, self-contained feature. Reads the existing plan but changes nothing
+// about how Hifz/Murajaah logic works. Uses floating local time (no TZID/Z
+// suffix on DTSTART/DTEND) - the correct choice for a personal recurring
+// routine, since the importing calendar app applies it in the viewer's own
+// current timezone, exactly as intended, with no timezone database needed.
+const ICS_BYDAY = { isnin:'MO', selasa:'TU', rabu:'WE', khamis:'TH', jumaat:'FR', sabtu:'SA', ahad:'SU' };
+const ICS_ISO_WEEKDAY = { isnin:1, selasa:2, rabu:3, khamis:4, jumaat:5, sabtu:6, ahad:7 };
+const ICS_TIME_CLOCK = { subuh:'0530', pagi:'0800', petang:'1500', maghrib:'1930', malam:'2100' };
+const ICS_DEFAULT_TIME = '2000';
+const ICS_DURATION_MINUTES = 30;
+
+function icsEscape(text){
+  return String(text||'')
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+function icsFoldLine(line){
+  // RFC 5545: lines should not exceed 75 octets; continuation lines start with a space
+  if(line.length <= 75) return line;
+  let out = line.slice(0,75);
+  let rest = line.slice(75);
+  while(rest.length > 0){
+    out += '\r\n ' + rest.slice(0,74);
+    rest = rest.slice(74);
+  }
+  return out;
+}
+function formatICSDateTimeUTC(date){
+  const p = n => String(n).padStart(2,'0');
+  return `${date.getUTCFullYear()}${p(date.getUTCMonth()+1)}${p(date.getUTCDate())}T${p(date.getUTCHours())}${p(date.getUTCMinutes())}${p(date.getUTCSeconds())}Z`;
+}
+function nextDateForIsoWeekday(isoWeekdayTarget){
+  const now = new Date();
+  const curIso = now.getDay() === 0 ? 7 : now.getDay();
+  let diff = isoWeekdayTarget - curIso;
+  if(diff < 0) diff += 7;
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  return d;
+}
+function addMinutesClock(hhmm, minutes){
+  const h = parseInt(hhmm.slice(0,2),10), m = parseInt(hhmm.slice(2,4),10);
+  const total = h*60 + m + minutes;
+  const nh = Math.floor((total % (24*60)) / 60), nm = total % 60;
+  return String(nh).padStart(2,'0') + String(nm).padStart(2,'0');
+}
+function buildICSEvent(uid, dtstamp, anchorDate, clockStart, byDayList, summary, description){
+  const p = n => String(n).padStart(2,'0');
+  const datePart = `${anchorDate.getFullYear()}${p(anchorDate.getMonth()+1)}${p(anchorDate.getDate())}`;
+  const clockEnd = addMinutesClock(clockStart, ICS_DURATION_MINUTES);
+  const rawLines = [
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${dtstamp}`,
+    `DTSTART:${datePart}T${clockStart}00`,
+    `DTEND:${datePart}T${clockEnd}00`,
+    `RRULE:FREQ=WEEKLY;BYDAY=${byDayList.join(',')}`,
+    `SUMMARY:${icsEscape(summary)}`,
+    `DESCRIPTION:${icsEscape(description)}`,
+    'END:VEVENT'
+  ];
+  // Returns individually-folded lines (an array), NOT a joined string - folding
+  // must happen per logical property line, before anything is joined with the
+  // other lines of the calendar, or a later fold pass would wrongly treat an
+  // already-multi-line block as a single overlong line and corrupt it.
+  return rawLines.map(icsFoldLine);
+}
+
+// Returns { ok:true, filename, content } or { ok:false, reason } - reason is a
+// user-facing Malay message for the one case that can't proceed (no active days).
+function generateHifzICS(){
+  const p = PROGRESS.plan;
+  const activeDayKeys = p.activeDays || [];
+  if(activeDayKeys.length === 0){
+    return { ok:false, reason:'Sila tetapkan sekurang-kurangnya satu hari aktif dalam Rancang sebelum eksport ke kalendar.' };
+  }
+  const byDayList = activeDayKeys.map(k => ICS_BYDAY[k]).filter(Boolean);
+  const earliestIso = Math.min(...activeDayKeys.map(k => ICS_ISO_WEEKDAY[k]));
+  const anchorDate = nextDateForIsoWeekday(earliestIso);
+  const clockStart = p.preferredTime ? (ICS_TIME_CLOCK[p.preferredTime] || ICS_DEFAULT_TIME) : ICS_DEFAULT_TIME;
+  const timeNote = p.preferredTime === 'maghrib' ? ' Masa dianggarkan - laraskan mengikut waktu Maghrib sebenar di kawasan anda.' : '';
+  const dtstamp = formatICSDateTimeUTC(new Date());
+
+  const paceLabel = p.paceTarget.pageFraction==='custom'
+    ? (p.paceTarget.customAyat ? `${p.paceTarget.customAyat} Ayat` : `${p.paceTarget.customPages||1} Halaman`)
+    : (p.paceTarget.pageFraction===0.25 ? '\u00bc Halaman' : p.paceTarget.pageFraction===1 ? '1 Halaman' : '\u00bd Halaman');
+  const juzCount = memorisedJuzList().length;
+  const dailyMurajaahTarget = juzPerDayForCycle(juzCount, p.murajaahCycleDays);
+
+  const eventLines = [];
+  eventLines.push(...buildICSEvent(
+    `hifz-companion-hafalan-baru-${Date.now()}@qurra-hifz-lab`, dtstamp, anchorDate, clockStart, byDayList,
+    `Hafalan Baru \u2014 ${paceLabel}`,
+    `Sasaran hafalan baru harian anda: ${paceLabel}.${timeNote} Semak aplikasi Hifz Companion untuk titik permulaan yang tepat.`
+  ));
+  eventLines.push(...buildICSEvent(
+    `hifz-companion-murajaah-${Date.now()+1}@qurra-hifz-lab`, dtstamp, anchorDate, clockStart, byDayList,
+    `Murajaah \u2014 ${dailyMurajaahTarget} Juz`,
+    `Murajaah harian anda (kitaran ${p.murajaahCycleDays} hari): kira-kira ${dailyMurajaahTarget} Juz.${timeNote} Semak aplikasi Hifz Companion untuk Juzuk yang tepat pada hari ini.`
+  ));
+
+  // Calendar-wrapper lines are short constants and never need folding, so they
+  // are joined directly alongside the already-folded event lines - no second
+  // fold pass over anything that might already contain embedded line breaks.
+  const calendar = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//QURRA Hifz Lab//Hifz Companion//MS',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    ...eventLines,
+    'END:VCALENDAR'
+  ].join('\r\n') + '\r\n';
+
+  return { ok:true, filename:'hifz-companion-rancangan.ics', content:calendar };
+}
+
 
 // ===================== State =====================
 let STATE = {
@@ -988,6 +1107,7 @@ function weeklyPlanDashHtml(){
     <div class="dash-card">
       <div class="week-grid">${cells}</div>
       <p class="muted" style="margin:10px 0 0;">Ketik hari untuk lihat butiran. Murajaah berlaku setiap hari aktif.</p>
+      <button class="btn btn-secondary btn-block" style="margin-top:14px;" data-action="export-ics">&#65291; Tambah ke Kalendar</button>
     </div>
   </div>`;
 }
@@ -1285,6 +1405,21 @@ function bindEvents(){
   app.querySelectorAll('[data-day-detail]').forEach(el => el.addEventListener('click', () => {
     openModal({ type:'day', dayKey: el.getAttribute('data-day-detail') });
   }));
+  const exportBtn = app.querySelector('[data-action="export-ics"]');
+  if(exportBtn) exportBtn.addEventListener('click', () => {
+    const result = generateHifzICS();
+    if(!result.ok){ alert(result.reason); return; }
+    try{
+      const blob = new Blob([result.content], { type:'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = result.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }catch(e){ alert('Maaf, eksport kalendar gagal. Sila cuba lagi.'); }
+  });
 
   // ---------- Peta Hifz ----------
   app.querySelectorAll('[data-surah-detail]').forEach(el => el.addEventListener('click', () => {
