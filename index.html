@@ -55,12 +55,20 @@ p{line-height:1.6;color:var(--charcoal);margin:0 0 10px;}
   width:28px;height:28px;border-radius:50%;border:1.5px solid var(--soft-gold);
   display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--soft-gold);flex:0 0 auto;
 }
+.nav-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
 .navlinks{display:flex;gap:16px;font-size:13.5px;flex-wrap:wrap;}
 .navlinks button{
   background:none;border:none;color:var(--ivory);opacity:0.72;cursor:pointer;
   font-family:var(--font-sans);font-size:13.5px;padding:4px 0;
 }
 .navlinks button.active{opacity:1;border-bottom:1.5px solid var(--soft-gold);}
+.lang-toggle{display:flex;gap:2px;border:1px solid rgba(250,246,236,0.35);border-radius:6px;padding:2px;flex-shrink:0;}
+.lang-toggle button{
+  background:none;border:none;color:var(--ivory);opacity:0.7;cursor:pointer;
+  font-family:var(--font-sans);font-size:12px;font-weight:600;letter-spacing:0.03em;
+  padding:4px 9px;border-radius:4px;
+}
+.lang-toggle button.active{opacity:1;background:var(--soft-gold);color:var(--charcoal);}
 
 main{flex:1;padding:22px 18px 60px;}
 @media (min-width:600px){ main{padding:28px 24px 60px;} }
@@ -258,14 +266,16 @@ function getSurah(no){ return SURAH_BY_NO[no]; }
 function juzBadgesForSurah(no){ return JUZ_STARTS.filter(j => j.surah === no).map(j => j.juz); }
 
 const RATINGS = ['lemah','sederhana','lancar'];
-const RATING_LABELS = { lemah:'Lemah', sederhana:'Sederhana', lancar:'Lancar' };
+const RATING_LABEL_KEYS = { lemah:'ratingLemah', sederhana:'ratingSederhana', lancar:'ratingLancar' };
 const TIME_OPTIONS = [
-  {key:'subuh', label:'Subuh'}, {key:'pagi', label:'Pagi'}, {key:'petang', label:'Petang'},
-  {key:'maghrib', label:'Selepas Maghrib'}, {key:'malam', label:'Malam'}
+  {key:'subuh', labelKey:'timeSubuh'}, {key:'pagi', labelKey:'timePagi'}, {key:'petang', labelKey:'timePetang'},
+  {key:'maghrib', labelKey:'timeMaghrib'}, {key:'malam', labelKey:'timeMalam'}
 ];
 const WEEKDAYS = [
-  {key:'isnin', label:'Isnin'}, {key:'selasa', label:'Selasa'}, {key:'rabu', label:'Rabu'},
-  {key:'khamis', label:'Khamis'}, {key:'jumaat', label:'Jumaat'}, {key:'sabtu', label:'Sabtu'}, {key:'ahad', label:'Ahad'}
+  {key:'isnin', labelKey:'dayIsnin', shortKey:'dayShortIsnin'}, {key:'selasa', labelKey:'daySelasa', shortKey:'dayShortSelasa'},
+  {key:'rabu', labelKey:'dayRabu', shortKey:'dayShortRabu'}, {key:'khamis', labelKey:'dayKhamis', shortKey:'dayShortKhamis'},
+  {key:'jumaat', labelKey:'dayJumaat', shortKey:'dayShortJumaat'}, {key:'sabtu', labelKey:'daySabtu', shortKey:'dayShortSabtu'},
+  {key:'ahad', labelKey:'dayAhad', shortKey:'dayShortAhad'}
 ];
 
 // Precompute which (surah, ayahFrom, ayahTo) spans make up each Juz - needed to
@@ -293,6 +303,7 @@ const JUZ_SURAH_SPANS = {}; // juz -> [{surah, fromAyah, toAyah}]
 
 // ===================== Storage =====================
 const STORAGE_KEY = 'qurra_hifz_companion_v1';
+const LANGUAGE_STORAGE_KEY = 'qurra_hifz_companion_language';
 
 function defaultProgress(){
   return {
@@ -345,7 +356,345 @@ function loadProgress(){
 function saveProgress(p){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){ /* best effort */ }
 }
-let PROGRESS = loadProgress();
+var PROGRESS = loadProgress();
+
+// ===================== Language =====================
+const I18N = {
+  ms: {
+    brand: 'Hifz Companion',
+    navUtama: 'Utama', navRancang: 'Rancang', navPetaHifz: 'Peta Hifz', navRiwayat: 'Riwayat',
+    footerNote: 'Hifz Lab &mdash; Hifz Companion. Data disimpan pada peranti anda sahaja.',
+
+    ratingLemah: 'Lemah', ratingSederhana: 'Sederhana', ratingLancar: 'Lancar',
+    ratingQualityPrompt: 'Sila pilih kualiti (Lemah / Sederhana / Lancar).',
+
+    timeSubuh: 'Subuh', timePagi: 'Pagi', timePetang: 'Petang', timeMaghrib: 'Selepas Maghrib', timeMalam: 'Malam',
+
+    dayIsnin: 'Isnin', daySelasa: 'Selasa', dayRabu: 'Rabu', dayKhamis: 'Khamis', dayJumaat: 'Jumaat', daySabtu: 'Sabtu', dayAhad: 'Ahad',
+    dayShortIsnin: 'Isn', dayShortSelasa: 'Sel', dayShortRabu: 'Rab', dayShortKhamis: 'Kha', dayShortJumaat: 'Jum', dayShortSabtu: 'Sab', dayShortAhad: 'Ahd',
+
+    ayahWord: 'ayat', juzWord: 'Juzuk',
+
+    // ---- Assessment wizard ----
+    stepOf: 'Langkah {step} daripada {total}',
+    stepBack: 'Kembali', stepNext: 'Seterusnya', stepSeeRecommendation: 'Lihat Cadangan',
+
+    step1Title: 'Hifz Sedia Ada',
+    step1Desc: 'Tandakan surah yang telah anda hafal sepenuhnya. Ini menentukan titik permulaan hafalan baru dan kitaran murajaah anda dengan tepat.',
+    step1JuzHeading: 'Juzuk {n}',
+    step1AyahSuffix: '({n} ayat)',
+    step1DirectionQuestion: 'Dari mana anda mahu teruskan hafalan baru?',
+    step1DirectionForward: 'Depan ke Belakang', step1DirectionBackward: 'Belakang ke Depan',
+    step1QualityQuestion: 'Secara jujur, bagaimana keadaan hafalan sedia ada ini?',
+    step1QualityKukuh: 'Kukuh', step1QualitySederhana: 'Sederhana', step1QualityLemah: 'Perlu Diperkukuh',
+
+    step2Title: 'Hafalan Baru',
+    step2Desc: 'Ini membina hafalan anda.',
+    step2SessionQuestion: 'Berapa banyak boleh dihafal setiap sesi?',
+    step2QuarterPage: '&frac14; Halaman', step2HalfPage: '&frac12; Halaman', step2OnePage: '1 Halaman', step2Custom: 'Custom',
+    step2CustomPagesLabel: 'Halaman Custom', step2CustomPagesPlaceholder: 'cth: 1.5',
+    step2CustomAyatLabel: 'Atau Terus Ayat', step2CustomAyatPlaceholder: 'cth: 10',
+    step2DaysPerWeekQuestion: 'Berapa hari seminggu boleh hafal baru?',
+
+    step3Title: 'Masa &amp; Hari',
+    step3Desc: 'Untuk rujukan anda sendiri &mdash; tidak menjejaskan jadual murajaah.',
+    step3TimeQuestion: 'Bila masa yang sesuai?',
+    step3DaysQuestion: 'Hari mana dalam minggu?',
+
+    step4Title: 'Murajaah',
+    step4Desc: 'Ini mengekalkan hafalan anda &mdash; bahagian paling penting.',
+    step4CapacityQuestion: 'Berapa banyak masa untuk murajaah setiap hari?',
+    capacitySedikit: 'Sedikit', capacitySederhana: 'Sederhana', capacityBanyak: 'Banyak',
+    capacityHintSedikit: '(~&frac12; Juz/hari)', capacityHintSederhana: '(~1 Juz/hari)', capacityHintBanyak: '(~2 Juz/hari)',
+    step4CapacityCustomLabel: 'Juz sehari (custom)',
+    step4CycleQuestion: 'Bilakah anda mahu satu kitaran murajaah lengkap selesai?',
+    step4CycleDaysOption: '{n} hari',
+    step4SummaryCard: 'Berdasarkan kira-kira {juz} Juzuk yang telah dihafal, ini bermaksud kira-kira <strong>{perDay} Juz sehari</strong> untuk kitaran {cycle} hari.',
+
+    // ---- Recommendation ----
+    recTitle: 'Cadangan Rancangan Hifz Anda',
+    recDesc: 'Ini adalah cadangan berdasarkan jawapan anda &mdash; bukan peraturan tetap. Anda boleh ubah bila-bila masa.',
+    recHafalanBaru: 'Hafalan Baru', recPerWeek: '{n} hari/minggu',
+    recMurajaah: 'Murajaah', recJuzPerDay: '{n} Juz sehari', recPerCycle: '{n} hari/kitaran',
+    recMasa: 'Masa', recHariAktif: 'Hari Aktif',
+    recAccept: 'Gunakan Cadangan', recAdjust: 'Ubah Rancangan',
+
+    // ---- Utama (Home) ----
+    utamaTitle: 'Utama',
+    streakCurrent: 'Hari Berterusan', streakPct: 'Al-Quran Dihafal', streakLongest: 'Rekod Terbaik',
+    allDoneTitle: 'Hari Ini Selesai', allDoneDesc: 'Hafalan baru dan murajaah hari ini telah dicatat. Teruskan esok.',
+
+    newCardTitle: '&#127793; Hafalan Baru', newCardTitleToday: '&#127793; Hafalan Baru Hari Ini',
+    newCardFullyDone: 'Al-Quran telah selesai dihafal sepenuhnya.',
+    newCardDoneToday: '&#10003; Sudah dicatat hari ini',
+    newCardContinueFrom: 'Sambung dari <strong>{surah}, ayat {ayah}</strong><br><span class="muted">Cadangan: hingga ayat {to}</span>',
+    newCardButton: 'Log Hafalan Baru',
+
+    murajaahCardTitle: '&#128260; Murajaah Hari Ini',
+    murajaahCardInactive: 'Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah.',
+    murajaahCardDoneToday: '&#10003; Sudah dicatat hari ini',
+    murajaahCardCycleProgress: 'Hari {day} daripada {total} &middot; {done}/{all} Juz selesai kitaran ini',
+    murajaahCardBonus: 'Tambahan (jika sempat): {list}',
+    murajaahCardButton: 'Log Murajaah',
+    juzListLabel: 'Juz {list}',
+
+    // ---- Rancang dashboard ----
+    rancangTitle: 'Rancangan Hifz Anda',
+    dashHifzProgress: '&#128214; Kemajuan Hifz',
+    dashJuzOf30: '{n} <span style="font-size:16px;color:var(--olive);">/ 30 Juz</span>',
+    dashPctOfQuran: '{pct}% daripada keseluruhan Al-Quran',
+
+    dashMurajaahCycle: '&#128260; Kitaran Murajaah',
+    dashMurajaahInactive: 'Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah lagi.',
+    dashCycleProgress: 'Kemajuan kitaran', dashCycleProgressVal: '{done}/{all} Juz selesai',
+    dashRemainingJuz: 'Baki Juzuk', dashRemainingJuzVal: '{n} Juz',
+    dashDailyTarget: 'Sasaran harian', dashDailyTargetVal: '{n} Juz/hari',
+    dashDaysRemaining: 'Anggaran hari berbaki', dashDaysRemainingVal: '{n} hari',
+
+    dashHafalanBaru: '&#127793; Hafalan Baru',
+    dashQuranFullyDone: 'Al-Quran telah selesai dihafal sepenuhnya.',
+    dashStartingPoint: 'Titik permulaan',
+    dashProgressIn: 'Kemajuan dalam {surah}', dashProgressInVal: '{done}/{total} ayat',
+    dashDailyTargetPace: 'Sasaran harian',
+
+    dashWeeklyPlan: '&#128197; Rancangan Mingguan',
+    dashWeeklyPlanHint: 'Ketik hari untuk lihat butiran. Murajaah berlaku setiap hari aktif.',
+    dashAddToCalendar: '&#65291; Tambah ke Kalendar',
+    editPlan: 'Ubah Rancangan',
+
+    positionQuranDone: 'Al-Quran selesai dihafal',
+    positionJuz: 'Juz {n}',
+    positionSurahAyah: '{surah}, ayat {ayah}',
+
+    // ---- Peta Hifz ----
+    petaTitle: 'Peta Hifz', petaDesc: 'Ketik mana-mana surah untuk lihat butiran.',
+    legendNotStarted: 'Belum Bermula', legendInProgress: 'Sedang Dihafal', legendMemorised: 'Dihafal', legendNeedsAttention: 'Perlu Perhatian',
+
+    // ---- Riwayat ----
+    riwayatTitle: 'Riwayat',
+    filterAll: 'Semua', filterNew: 'Hafalan Baru', filterMurajaah: 'Murajaah',
+    entryTypeNew: 'Hafalan Baru', entryTypeMurajaah: 'Murajaah',
+    riwayatEmpty: 'Tiada rekod lagi.',
+    riwayatAyahRange: 'ayat {from}&ndash;{to}',
+    riwayatJuz: 'Juz {n}',
+
+    // ---- Modals ----
+    modalLogNewTitle: 'Log Hafalan Baru',
+    fieldSurah: 'Surah', fieldAyahFrom: 'Ayat Dari', fieldAyahTo: 'Ayat Hingga',
+    fieldQuality: 'Kualiti', fieldNoteOptional: 'Nota (Pilihan)', notePlaceholder: 'cth: keliru dengan ayat lain...',
+    btnSave: 'Simpan',
+    modalLogMurajaahTitle: 'Log Murajaah', fieldJuzuk: 'Juzuk',
+
+    modalCalendarTitle: 'Tambah ke Kalendar',
+    calendarNoActiveDays: 'Sila tetapkan sekurang-kurangnya satu hari aktif dalam Rancang sebelum menambah ke kalendar.',
+    calendarChooseOne: 'Google Calendar hanya boleh tambah satu acara berulang pada satu masa. Pilih yang mana dahulu &mdash; anda boleh tambah yang satu lagi selepas ini.',
+    calendarOpenNewTab: 'Buka Google Calendar dalam tab baharu',
+
+    dayDetailInactive: 'Bukan hari aktif dalam rancangan anda.',
+    dayDetailHafalanBaru: '&#127793; Hafalan Baru', dayDetailMurajaah: '&#128260; Murajaah', dayDetailMasa: '&#128337; Masa',
+
+    surahDetailTotalAyah: 'Jumlah Ayat', surahDetailStatus: 'Status',
+    statusNotStarted: 'Belum Bermula', statusInProgress: 'Sedang Dihafal', statusMemorised: 'Dihafal',
+    surahDetailMemorisedUpTo: 'Dihafal Hingga Ayat', surahDetailLastQuality: 'Kualiti Terakhir', surahDetailLastDate: 'Tarikh Terakhir',
+    surahDetailHistory: 'Sejarah Terkini', surahDetailNoHistory: 'Tiada rekod lagi untuk surah ini.',
+    surahDetailAyahRange: 'ayat {from}&ndash;{to}', surahDetailMurajaahJuz: 'Murajaah Juz {n}',
+
+    // ---- Alerts / validation ----
+    alertPickQuality: 'Sila pilih kualiti (Lemah / Sederhana / Lancar).',
+    alertCheckAyahRange: 'Sila semak julat ayat.',
+    alertAyahOutOfRange: 'Julat ayat di luar bilangan ayat surah ini.',
+
+    // ---- Google Calendar export text ----
+    calPageQuarter: '&frac14; Halaman', calPageHalf: '&frac12; Halaman', calPageOne: '1 Halaman',
+    calPageCustom: '{n} Halaman', calAyatCustom: '{n} Ayat',
+    calMaghribNote: ' Masa dianggarkan - laraskan mengikut waktu Maghrib sebenar di kawasan anda.',
+    calHafalanTitle: 'Hafalan Baru &mdash; {pace}',
+    calHafalanDesc: 'Sasaran hafalan baru harian anda: {pace}.{timeNote} Semak aplikasi Hifz Companion untuk titik permulaan yang tepat.',
+    calMurajaahTitle: 'Murajaah &mdash; {n} Juz',
+    calMurajaahDesc: 'Murajaah harian anda (kitaran {cycle} hari): kira-kira {n} Juz.{timeNote} Semak aplikasi Hifz Companion untuk Juzuk yang tepat pada hari ini.',
+  },
+  en: {
+    brand: 'Hifz Companion',
+    navUtama: 'Home', navRancang: 'Plan', navPetaHifz: 'Hifz Map', navRiwayat: 'History',
+    footerNote: 'Hifz Lab &mdash; Hifz Companion. Data is stored on your device only.',
+
+    ratingLemah: 'Weak', ratingSederhana: 'Moderate', ratingLancar: 'Fluent',
+    ratingQualityPrompt: 'Please choose a quality (Weak / Moderate / Fluent).',
+
+    timeSubuh: 'Subuh', timePagi: 'Morning', timePetang: 'Afternoon', timeMaghrib: 'After Maghrib', timeMalam: 'Night',
+
+    dayIsnin: 'Monday', daySelasa: 'Tuesday', dayRabu: 'Wednesday', dayKhamis: 'Thursday', dayJumaat: 'Friday', daySabtu: 'Saturday', dayAhad: 'Sunday',
+    dayShortIsnin: 'Mon', dayShortSelasa: 'Tue', dayShortRabu: 'Wed', dayShortKhamis: 'Thu', dayShortJumaat: 'Fri', dayShortSabtu: 'Sat', dayShortAhad: 'Sun',
+
+    ayahWord: 'ayah', juzWord: 'Juz',
+
+    // ---- Assessment wizard ----
+    stepOf: 'Step {step} of {total}',
+    stepBack: 'Back', stepNext: 'Next', stepSeeRecommendation: 'See Recommendation',
+
+    step1Title: 'Existing Hifz',
+    step1Desc: 'Check off the surahs you have already fully memorised. This sets your exact starting point for new memorisation and your murajaah cycle.',
+    step1JuzHeading: 'Juz {n}',
+    step1AyahSuffix: '({n} ayah)',
+    step1DirectionQuestion: 'Where would you like to continue new memorisation from?',
+    step1DirectionForward: 'Front to Back', step1DirectionBackward: 'Back to Front',
+    step1QualityQuestion: 'Honestly, how solid is this existing memorisation?',
+    step1QualityKukuh: 'Solid', step1QualitySederhana: 'Moderate', step1QualityLemah: 'Needs Strengthening',
+
+    step2Title: 'New Memorisation',
+    step2Desc: 'This builds your hifz.',
+    step2SessionQuestion: 'How much can you memorise per session?',
+    step2QuarterPage: '&frac14; Page', step2HalfPage: '&frac12; Page', step2OnePage: '1 Page', step2Custom: 'Custom',
+    step2CustomPagesLabel: 'Custom Pages', step2CustomPagesPlaceholder: 'e.g. 1.5',
+    step2CustomAyatLabel: 'Or Ayah Directly', step2CustomAyatPlaceholder: 'e.g. 10',
+    step2DaysPerWeekQuestion: 'How many days a week can you memorise new material?',
+
+    step3Title: 'Time &amp; Days',
+    step3Desc: 'For your own reference &mdash; this does not affect the murajaah schedule.',
+    step3TimeQuestion: 'What time works best?',
+    step3DaysQuestion: 'Which days of the week?',
+
+    step4Title: 'Murajaah',
+    step4Desc: 'This is what keeps your hifz &mdash; the most important part.',
+    step4CapacityQuestion: 'How much time can you give to murajaah each day?',
+    capacitySedikit: 'A Little', capacitySederhana: 'Moderate', capacityBanyak: 'A Lot',
+    capacityHintSedikit: '(~&frac12; Juz/day)', capacityHintSederhana: '(~1 Juz/day)', capacityHintBanyak: '(~2 Juz/day)',
+    step4CapacityCustomLabel: 'Juz per day (custom)',
+    step4CycleQuestion: 'How long do you want one full murajaah cycle to take?',
+    step4CycleDaysOption: '{n} days',
+    step4SummaryCard: 'Based on roughly {juz} Juz already memorised, this means about <strong>{perDay} Juz a day</strong> for a {cycle}-day cycle.',
+
+    // ---- Recommendation ----
+    recTitle: 'Your Suggested Hifz Plan',
+    recDesc: 'This is a suggestion based on your answers &mdash; not a fixed rule. You can change it any time.',
+    recHafalanBaru: 'New Memorisation', recPerWeek: '{n} days/week',
+    recMurajaah: 'Murajaah', recJuzPerDay: '{n} Juz a day', recPerCycle: '{n} days/cycle',
+    recMasa: 'Time', recHariAktif: 'Active Days',
+    recAccept: 'Use This Plan', recAdjust: 'Adjust Plan',
+
+    // ---- Utama (Home) ----
+    utamaTitle: 'Home',
+    streakCurrent: 'Day Streak', streakPct: 'Quran Memorised', streakLongest: 'Best Record',
+    allDoneTitle: 'All Done for Today', allDoneDesc: "Today's new memorisation and murajaah have been logged. Continue tomorrow.",
+
+    newCardTitle: '&#127793; New Memorisation', newCardTitleToday: '&#127793; New Memorisation Today',
+    newCardFullyDone: 'The whole Quran has been fully memorised.',
+    newCardDoneToday: '&#10003; Already logged today',
+    newCardContinueFrom: 'Continue from <strong>{surah}, ayah {ayah}</strong><br><span class="muted">Suggested: up to ayah {to}</span>',
+    newCardButton: 'Log New Memorisation',
+
+    murajaahCardTitle: '&#128260; Murajaah Today',
+    murajaahCardInactive: 'No Juz has been fully memorised yet to revise.',
+    murajaahCardDoneToday: '&#10003; Already logged today',
+    murajaahCardCycleProgress: 'Day {day} of {total} &middot; {done}/{all} Juz done this cycle',
+    murajaahCardBonus: 'Bonus (if you have time): {list}',
+    murajaahCardButton: 'Log Murajaah',
+    juzListLabel: 'Juz {list}',
+
+    // ---- Rancang dashboard ----
+    rancangTitle: 'Your Hifz Plan',
+    dashHifzProgress: '&#128214; Hifz Progress',
+    dashJuzOf30: '{n} <span style="font-size:16px;color:var(--olive);">/ 30 Juz</span>',
+    dashPctOfQuran: '{pct}% of the whole Quran',
+
+    dashMurajaahCycle: '&#128260; Murajaah Cycle',
+    dashMurajaahInactive: 'No Juz has been fully memorised yet to revise.',
+    dashCycleProgress: 'Cycle progress', dashCycleProgressVal: '{done}/{all} Juz done',
+    dashRemainingJuz: 'Juz remaining', dashRemainingJuzVal: '{n} Juz',
+    dashDailyTarget: 'Daily target', dashDailyTargetVal: '{n} Juz/day',
+    dashDaysRemaining: 'Estimated days left', dashDaysRemainingVal: '{n} days',
+
+    dashHafalanBaru: '&#127793; New Memorisation',
+    dashQuranFullyDone: 'The whole Quran has been fully memorised.',
+    dashStartingPoint: 'Starting point',
+    dashProgressIn: 'Progress in {surah}', dashProgressInVal: '{done}/{total} ayah',
+    dashDailyTargetPace: 'Daily target',
+
+    dashWeeklyPlan: '&#128197; Weekly Plan',
+    dashWeeklyPlanHint: 'Tap a day to see details. Murajaah happens on every active day.',
+    dashAddToCalendar: '&#65291; Add to Calendar',
+    editPlan: 'Adjust Plan',
+
+    positionQuranDone: 'Quran fully memorised',
+    positionJuz: 'Juz {n}',
+    positionSurahAyah: '{surah}, ayah {ayah}',
+
+    // ---- Peta Hifz ----
+    petaTitle: 'Hifz Map', petaDesc: 'Tap any surah to see details.',
+    legendNotStarted: 'Not Started', legendInProgress: 'In Progress', legendMemorised: 'Memorised', legendNeedsAttention: 'Needs Attention',
+
+    // ---- Riwayat ----
+    riwayatTitle: 'History',
+    filterAll: 'All', filterNew: 'New Memorisation', filterMurajaah: 'Murajaah',
+    entryTypeNew: 'New Memorisation', entryTypeMurajaah: 'Murajaah',
+    riwayatEmpty: 'No records yet.',
+    riwayatAyahRange: 'ayah {from}&ndash;{to}',
+    riwayatJuz: 'Juz {n}',
+
+    // ---- Modals ----
+    modalLogNewTitle: 'Log New Memorisation',
+    fieldSurah: 'Surah', fieldAyahFrom: 'From Ayah', fieldAyahTo: 'To Ayah',
+    fieldQuality: 'Quality', fieldNoteOptional: 'Note (Optional)', notePlaceholder: 'e.g. confused with another ayah...',
+    btnSave: 'Save',
+    modalLogMurajaahTitle: 'Log Murajaah', fieldJuzuk: 'Juz',
+
+    modalCalendarTitle: 'Add to Calendar',
+    calendarNoActiveDays: 'Please set at least one active day in Plan before adding to the calendar.',
+    calendarChooseOne: 'Google Calendar can only add one recurring event at a time. Choose one first &mdash; you can add the other afterwards.',
+    calendarOpenNewTab: 'Open Google Calendar in a new tab',
+
+    dayDetailInactive: 'Not an active day in your plan.',
+    dayDetailHafalanBaru: '&#127793; New Memorisation', dayDetailMurajaah: '&#128260; Murajaah', dayDetailMasa: '&#128337; Time',
+
+    surahDetailTotalAyah: 'Total Ayah', surahDetailStatus: 'Status',
+    statusNotStarted: 'Not Started', statusInProgress: 'In Progress', statusMemorised: 'Memorised',
+    surahDetailMemorisedUpTo: 'Memorised Up To Ayah', surahDetailLastQuality: 'Last Quality', surahDetailLastDate: 'Last Date',
+    surahDetailHistory: 'Recent History', surahDetailNoHistory: 'No records yet for this surah.',
+    surahDetailAyahRange: 'ayah {from}&ndash;{to}', surahDetailMurajaahJuz: 'Murajaah Juz {n}',
+
+    // ---- Alerts / validation ----
+    alertPickQuality: 'Please choose a quality (Weak / Moderate / Fluent).',
+    alertCheckAyahRange: 'Please check the ayah range.',
+    alertAyahOutOfRange: "The ayah range is outside this surah's ayah count.",
+
+    // ---- Google Calendar export text ----
+    calPageQuarter: '&frac14; Page', calPageHalf: '&frac12; Page', calPageOne: '1 Page',
+    calPageCustom: '{n} Pages', calAyatCustom: '{n} Ayah',
+    calMaghribNote: ' Time is approximate - adjust to the actual Maghrib time in your area.',
+    calHafalanTitle: 'New Memorisation &mdash; {pace}',
+    calHafalanDesc: "Your daily new-memorisation target: {pace}.{timeNote} Check the Hifz Companion app for your exact starting point.",
+    calMurajaahTitle: 'Murajaah &mdash; {n} Juz',
+    calMurajaahDesc: 'Your daily murajaah ({cycle}-day cycle): about {n} Juz.{timeNote} Check the Hifz Companion app for exactly which Juz is due today.',
+  }
+};
+
+function loadLanguagePreference(){
+  try{
+    const raw = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if(raw === 'en' || raw === 'ms') return raw;
+  }catch(e){ /* best effort */ }
+  return 'ms';
+}
+function persistLanguage(lang){
+  try{ localStorage.setItem(LANGUAGE_STORAGE_KEY, lang); }catch(e){ /* best effort */ }
+}
+var LANG = loadLanguagePreference();
+
+function t(key, vars){
+  const dict = I18N[LANG] || I18N.ms;
+  let str = (key in dict) ? dict[key] : ((key in I18N.ms) ? I18N.ms[key] : key);
+  if(vars){
+    Object.keys(vars).forEach(k => { str = str.split('{'+k+'}').join(vars[k]); });
+  }
+  return str;
+}
+function setLanguage(lang){
+  if(lang !== 'en' && lang !== 'ms') return;
+  LANG = lang;
+  persistLanguage(lang);
+  document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'ms');
+  render();
+}
 
 // ===================== Date helpers =====================
 function todayStr(){
@@ -530,19 +879,20 @@ function needsAttentionList(){
   return SURAHS.filter(s => getSurahStatus(s.no).status==='memorised' && getSurahStatus(s.no).lastRating==='lemah');
 }
 
-// Human-readable "Titik Permulaan" - shows "Juz N" only when the actual
+// Human-readable "starting point" - shows "Juz N" only when the actual
 // position pointer sits exactly at a real Juz boundary (e.g. baseline import
 // of complete Juz 1-10 correctly continues at "Juz 11"); otherwise shows the
 // precise Surah+Ayah, since that's what the pointer actually is for any
-// irregular/individual-surah selection.
+// irregular/individual-surah selection. Language-aware: computed fresh from
+// LANG at call time, never baked into stored state.
 function positionPointerLabel(){
   const pos = PROGRESS.plan.positionPointer;
   const surah = getSurah(pos.surah);
   if(!surah) return '&mdash;';
-  if(pos.ayah > surah.totalAyah) return 'Al-Quran selesai dihafal';
+  if(pos.ayah > surah.totalAyah) return t('positionQuranDone');
   const juzMatch = JUZ_STARTS.find(j => j.surah === pos.surah && j.ayah === pos.ayah);
-  if(juzMatch) return `Juz ${juzMatch.juz}`;
-  return `${surah.name}, ayat ${pos.ayah}`;
+  if(juzMatch) return t('positionJuz', {n:juzMatch.juz});
+  return t('positionSurahAyah', {surah: surah.name, ayah: pos.ayah});
 }
 
 // ===================== Assessment -> Recommendation math =====================
@@ -562,7 +912,10 @@ function juzPerDayForCycle(totalJuz, cycleDays){
 // no API key, no OAuth, no backend. The link includes ctz (IANA timezone,
 // read from the browser) plus wall-clock local times, which is Google's
 // documented way to have the event interpreted correctly without needing to
-// know or embed timezone offset data ourselves.
+// know or embed timezone offset data ourselves. Title/description text is
+// generated fresh from the current LANG at call time, so an exported event
+// always matches whichever language was active when "Add to Calendar" was
+// clicked.
 const CAL_BYDAY = { isnin:'MO', selasa:'TU', rabu:'WE', khamis:'TH', jumaat:'FR', sabtu:'SA', ahad:'SU' };
 const CAL_ISO_WEEKDAY = { isnin:1, selasa:2, rabu:3, khamis:4, jumaat:5, sabtu:6, ahad:7 };
 const CAL_TIME_CLOCK = { subuh:'0530', pagi:'0800', petang:'1500', maghrib:'1930', malam:'2100' };
@@ -587,46 +940,53 @@ function getUserTimezone(){
   try{ return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }catch(e){ return 'UTC'; }
 }
 
+function calPaceLabel(paceTarget){
+  if(paceTarget.pageFraction === 'custom'){
+    return paceTarget.customAyat ? t('calAyatCustom', {n:paceTarget.customAyat}) : t('calPageCustom', {n:paceTarget.customPages||1});
+  }
+  if(paceTarget.pageFraction === 0.25) return t('calPageQuarter');
+  if(paceTarget.pageFraction === 1) return t('calPageOne');
+  return t('calPageHalf');
+}
+
 // eventType: 'hafalan' | 'murajaah'. Returns { ok:true, url, title } or
-// { ok:false, reason } - reason is a user-facing Malay message for the one
-// case that can't proceed (no active days chosen yet).
+// { ok:false, reason } - reason is a user-facing message (in the current
+// language) for the one case that can't proceed (no active days chosen yet).
 function buildGoogleCalendarUrl(eventType){
   const p = PROGRESS.plan;
   const activeDayKeys = p.activeDays || [];
   if(activeDayKeys.length === 0){
-    return { ok:false, reason:'Sila tetapkan sekurang-kurangnya satu hari aktif dalam Rancang sebelum menambah ke kalendar.' };
+    return { ok:false, reason: t('calendarNoActiveDays') };
   }
   const byDayList = activeDayKeys.map(k => CAL_BYDAY[k]).filter(Boolean);
   const earliestIso = Math.min(...activeDayKeys.map(k => CAL_ISO_WEEKDAY[k]));
   const anchorDate = nextDateForIsoWeekday(earliestIso);
   const clockStart = p.preferredTime ? (CAL_TIME_CLOCK[p.preferredTime] || CAL_DEFAULT_TIME) : CAL_DEFAULT_TIME;
   const clockEnd = addMinutesClock(clockStart, CAL_DURATION_MINUTES);
-  const timeNote = p.preferredTime === 'maghrib' ? ' Masa dianggarkan - laraskan mengikut waktu Maghrib sebenar di kawasan anda.' : '';
+  const timeNote = p.preferredTime === 'maghrib' ? t('calMaghribNote') : '';
 
   const pad = n => String(n).padStart(2,'0');
   const datePart = `${anchorDate.getFullYear()}${pad(anchorDate.getMonth()+1)}${pad(anchorDate.getDate())}`;
   const datesParam = `${datePart}T${clockStart}00/${datePart}T${clockEnd}00`;
 
-  const paceLabel = p.paceTarget.pageFraction==='custom'
-    ? (p.paceTarget.customAyat ? `${p.paceTarget.customAyat} Ayat` : `${p.paceTarget.customPages||1} Halaman`)
-    : (p.paceTarget.pageFraction===0.25 ? '\u00bc Halaman' : p.paceTarget.pageFraction===1 ? '1 Halaman' : '\u00bd Halaman');
+  const paceLabel = calPaceLabel(p.paceTarget);
   const juzCount = memorisedJuzList().length;
   const dailyMurajaahTarget = juzPerDayForCycle(juzCount, p.murajaahCycleDays);
 
   let title, description;
   if(eventType === 'hafalan'){
-    title = `Hafalan Baru \u2014 ${paceLabel}`;
-    description = `Sasaran hafalan baru harian anda: ${paceLabel}.${timeNote} Semak aplikasi Hifz Companion untuk titik permulaan yang tepat.`;
+    title = t('calHafalanTitle', {pace:paceLabel});
+    description = t('calHafalanDesc', {pace:paceLabel, timeNote});
   } else {
-    title = `Murajaah \u2014 ${dailyMurajaahTarget} Juz`;
-    description = `Murajaah harian anda (kitaran ${p.murajaahCycleDays} hari): kira-kira ${dailyMurajaahTarget} Juz.${timeNote} Semak aplikasi Hifz Companion untuk Juzuk yang tepat pada hari ini.`;
+    title = t('calMurajaahTitle', {n:dailyMurajaahTarget});
+    description = t('calMurajaahDesc', {n:dailyMurajaahTarget, cycle:p.murajaahCycleDays, timeNote});
   }
 
   const params = new URLSearchParams({
     action: 'TEMPLATE',
-    text: title,
+    text: title.replace(/&mdash;/g,'—'),
     dates: datesParam,
-    details: description,
+    details: description.replace(/&mdash;/g,'—'),
     recur: `RRULE:FREQ=WEEKLY;BYDAY=${byDayList.join(',')}`,
     ctz: getUserTimezone()
   });
@@ -635,7 +995,7 @@ function buildGoogleCalendarUrl(eventType){
 
 
 // ===================== State =====================
-let STATE = {
+var STATE = {
   screen: 'utama', // utama | rancang | petahifz | riwayat | assessment | recommendation
   modal: null,
   riwayatFilter: 'all', // all | new | murajaah
@@ -644,7 +1004,11 @@ let STATE = {
 };
 
 const QUALITY_TO_RATING = { kukuh:'lancar', sederhana:'sederhana', lemah:'lemah' };
-const CAPACITY_PRESETS = [ {key:0.5, label:'Sedikit', hint:'~\u00bd Juz/hari'}, {key:1, label:'Sederhana', hint:'~1 Juz/hari'}, {key:2, label:'Banyak', hint:'~2 Juz/hari'} ];
+const CAPACITY_PRESETS = [
+  {key:0.5, labelKey:'capacitySedikit', hintKey:'capacityHintSedikit'},
+  {key:1, labelKey:'capacitySederhana', hintKey:'capacityHintSederhana'},
+  {key:2, labelKey:'capacityBanyak', hintKey:'capacityHintBanyak'}
+];
 const CYCLE_PRESETS = [7, 10, 14];
 
 function escapeHtml(s){
@@ -668,22 +1032,34 @@ function openModal(modal){ STATE.modal = modal; render(); }
 function closeModal(){ STATE.modal = null; render(); }
 
 // ===================== Nav / footer =====================
+function langToggleHtml(){
+  return `
+  <div class="lang-toggle" id="langToggle" role="group" aria-label="Language / Bahasa">
+    <button type="button" data-lang="ms" class="${LANG==='ms'?'active':''}" aria-pressed="${LANG==='ms'}">BM</button>
+    <button type="button" data-lang="en" class="${LANG==='en'?'active':''}" aria-pressed="${LANG==='en'}">EN</button>
+  </div>`;
+}
 function navHtml(){
-  if(['assessment','recommendation'].includes(STATE.screen)) return '<div class="nav"><div class="brand"><span class="mark">Q</span> Hifz Companion</div></div>';
+  if(['assessment','recommendation'].includes(STATE.screen)){
+    return `<div class="nav"><div class="brand"><span class="mark">Q</span> ${t('brand')}</div>${langToggleHtml()}</div>`;
+  }
   const items = [
-    {key:'utama', label:'Utama'}, {key:'rancang', label:'Rancang'},
-    {key:'petahifz', label:'Peta Hifz'}, {key:'riwayat', label:'Riwayat'},
+    {key:'utama', labelKey:'navUtama'}, {key:'rancang', labelKey:'navRancang'},
+    {key:'petahifz', labelKey:'navPetaHifz'}, {key:'riwayat', labelKey:'navRiwayat'},
   ];
   return `
   <div class="nav">
-    <div class="brand"><span class="mark">Q</span> Hifz Companion</div>
-    <div class="navlinks">
-      ${items.map(it => `<button data-nav="${it.key}" class="${STATE.screen===it.key?'active':''}">${it.label}</button>`).join('')}
+    <div class="brand"><span class="mark">Q</span> ${t('brand')}</div>
+    <div class="nav-right">
+      <div class="navlinks">
+        ${items.map(it => `<button data-nav="${it.key}" class="${STATE.screen===it.key?'active':''}">${t(it.labelKey)}</button>`).join('')}
+      </div>
+      ${langToggleHtml()}
     </div>
   </div>`;
 }
 function footerHtml(){
-  return `<footer class="page-footer">Hifz Lab &mdash; Hifz Companion. Data disimpan pada peranti anda sahaja.</footer>`;
+  return `<footer class="page-footer">${t('footerNote')}</footer>`;
 }
 
 function screenHtml(){
@@ -735,12 +1111,12 @@ function assessmentHtml(){
   else body = assessmentStep4();
 
   return `
-  <p class="muted">Langkah ${step} daripada ${totalSteps}</p>
+  <p class="muted">${t('stepOf', {step, total:totalSteps})}</p>
   <div class="progress-track"><div class="progress-fill" style="width:${(step/totalSteps)*100}%"></div></div>
   ${body}
   <div class="quiz-footer">
-    ${step>1 ? `<button class="btn btn-secondary" data-action="assess-back">Kembali</button>` : `<span></span>`}
-    <button class="btn btn-primary" data-action="assess-next">${step<totalSteps ? 'Seterusnya' : 'Lihat Cadangan'}</button>
+    ${step>1 ? `<button class="btn btn-secondary" data-action="assess-back">${t('stepBack')}</button>` : `<span></span>`}
+    <button class="btn btn-primary" data-action="assess-next">${step<totalSteps ? t('stepNext') : t('stepSeeRecommendation')}</button>
   </div>`;
 }
 
@@ -755,31 +1131,31 @@ function assessmentStep1(){
   let currentJuz = null;
   SURAHS.forEach(s => {
     const j = juzOfSurah[s.no];
-    if(j !== currentJuz){ pickerHtml += `<div class="juz-heading">Juzuk ${j}</div>`; currentJuz = j; }
+    if(j !== currentJuz){ pickerHtml += `<div class="juz-heading">${t('step1JuzHeading',{n:j})}</div>`; currentJuz = j; }
     const checked = f.baselineSelection.has(s.no) ? 'checked' : '';
-    pickerHtml += `<label class="surah-picker-item"><input type="checkbox" data-baseline-surah="${s.no}" ${checked}> ${escapeHtml(s.name)} <span class="muted">(${s.totalAyah} ayat)</span></label>`;
+    pickerHtml += `<label class="surah-picker-item"><input type="checkbox" data-baseline-surah="${s.no}" ${checked}> ${escapeHtml(s.name)} <span class="muted">${t('step1AyahSuffix',{n:s.totalAyah})}</span></label>`;
   });
 
   return `
-  <h2>Hifz Sedia Ada</h2>
-  <p class="muted">Tandakan surah yang telah anda hafal sepenuhnya. Ini menentukan titik permulaan hafalan baru dan kitaran murajaah anda dengan tepat.</p>
+  <h2>${t('step1Title')}</h2>
+  <p class="muted">${t('step1Desc')}</p>
   <div class="field">
     <div class="surah-picker">${pickerHtml}</div>
   </div>
   <div class="field">
-    <label>Dari mana anda mahu teruskan hafalan baru?</label>
+    <label>${t('step1DirectionQuestion')}</label>
     <div class="choice-group">
-      <div class="choice ${f.direction==='front-to-back'?'selected':''}" data-set-assess="direction:front-to-back">Depan ke Belakang</div>
-      <div class="choice ${f.direction==='back-to-front'?'selected':''}" data-set-assess="direction:back-to-front">Belakang ke Depan</div>
+      <div class="choice ${f.direction==='front-to-back'?'selected':''}" data-set-assess="direction:front-to-back">${t('step1DirectionForward')}</div>
+      <div class="choice ${f.direction==='back-to-front'?'selected':''}" data-set-assess="direction:back-to-front">${t('step1DirectionBackward')}</div>
     </div>
   </div>
   ${f.baselineSelection.size > 0 ? `
   <div class="field">
-    <label>Secara jujur, bagaimana keadaan hafalan sedia ada ini?</label>
+    <label>${t('step1QualityQuestion')}</label>
     <div class="choice-group">
-      <div class="choice ${f.quality==='kukuh'?'selected':''}" data-set-assess="quality:kukuh">Kukuh</div>
-      <div class="choice ${f.quality==='sederhana'?'selected':''}" data-set-assess="quality:sederhana">Sederhana</div>
-      <div class="choice ${f.quality==='lemah'?'selected':''}" data-set-assess="quality:lemah">Perlu Diperkukuh</div>
+      <div class="choice ${f.quality==='kukuh'?'selected':''}" data-set-assess="quality:kukuh">${t('step1QualityKukuh')}</div>
+      <div class="choice ${f.quality==='sederhana'?'selected':''}" data-set-assess="quality:sederhana">${t('step1QualitySederhana')}</div>
+      <div class="choice ${f.quality==='lemah'?'selected':''}" data-set-assess="quality:lemah">${t('step1QualityLemah')}</div>
     </div>
   </div>` : ''}
   `;
@@ -789,24 +1165,24 @@ function assessmentStep2(){
   const f = STATE.assessmentForm;
   const isCustom = f.pageFraction === 'custom';
   return `
-  <h2>Hafalan Baru</h2>
-  <p class="muted">Ini membina hafalan anda.</p>
+  <h2>${t('step2Title')}</h2>
+  <p class="muted">${t('step2Desc')}</p>
   <div class="field">
-    <label>Berapa banyak boleh dihafal setiap sesi?</label>
+    <label>${t('step2SessionQuestion')}</label>
     <div class="choice-group">
-      <div class="choice ${f.pageFraction===0.25?'selected':''}" data-set-assess="pageFraction:0.25">&frac14; Halaman</div>
-      <div class="choice ${f.pageFraction===0.5?'selected':''}" data-set-assess="pageFraction:0.5">&frac12; Halaman</div>
-      <div class="choice ${f.pageFraction===1?'selected':''}" data-set-assess="pageFraction:1">1 Halaman</div>
-      <div class="choice ${isCustom?'selected':''}" data-set-assess="pageFraction:custom">Custom</div>
+      <div class="choice ${f.pageFraction===0.25?'selected':''}" data-set-assess="pageFraction:0.25">${t('step2QuarterPage')}</div>
+      <div class="choice ${f.pageFraction===0.5?'selected':''}" data-set-assess="pageFraction:0.5">${t('step2HalfPage')}</div>
+      <div class="choice ${f.pageFraction===1?'selected':''}" data-set-assess="pageFraction:1">${t('step2OnePage')}</div>
+      <div class="choice ${isCustom?'selected':''}" data-set-assess="pageFraction:custom">${t('step2Custom')}</div>
     </div>
     ${isCustom ? `
     <div class="row2" style="margin-top:12px;">
-      <div class="field"><label>Halaman Custom</label><input type="number" min="0.1" step="0.1" data-form-field="customPages" value="${f.customPages||''}" placeholder="cth: 1.5"></div>
-      <div class="field"><label>Atau Terus Ayat</label><input type="number" min="1" data-form-field="customAyat" value="${f.customAyat||''}" placeholder="cth: 10"></div>
+      <div class="field"><label>${t('step2CustomPagesLabel')}</label><input type="number" min="0.1" step="0.1" data-form-field="customPages" value="${f.customPages||''}" placeholder="${t('step2CustomPagesPlaceholder')}"></div>
+      <div class="field"><label>${t('step2CustomAyatLabel')}</label><input type="number" min="1" data-form-field="customAyat" value="${f.customAyat||''}" placeholder="${t('step2CustomAyatPlaceholder')}"></div>
     </div>` : ''}
   </div>
   <div class="field">
-    <label>Berapa hari seminggu boleh hafal baru?</label>
+    <label>${t('step2DaysPerWeekQuestion')}</label>
     <input type="number" min="1" max="7" data-form-field="hafalanDaysPerWeek" value="${f.hafalanDaysPerWeek}">
   </div>
   `;
@@ -815,18 +1191,18 @@ function assessmentStep2(){
 function assessmentStep3(){
   const f = STATE.assessmentForm;
   return `
-  <h2>Masa &amp; Hari</h2>
-  <p class="muted">Untuk rujukan anda sendiri &mdash; tidak menjejaskan jadual murajaah.</p>
+  <h2>${t('step3Title')}</h2>
+  <p class="muted">${t('step3Desc')}</p>
   <div class="field">
-    <label>Bila masa yang sesuai?</label>
+    <label>${t('step3TimeQuestion')}</label>
     <div class="choice-group">
-      ${TIME_OPTIONS.map(t => `<div class="choice ${f.preferredTime===t.key?'selected':''}" data-set-assess="preferredTime:${t.key}">${t.label}</div>`).join('')}
+      ${TIME_OPTIONS.map(o => `<div class="choice ${f.preferredTime===o.key?'selected':''}" data-set-assess="preferredTime:${o.key}">${t(o.labelKey)}</div>`).join('')}
     </div>
   </div>
   <div class="field">
-    <label>Hari mana dalam minggu?</label>
+    <label>${t('step3DaysQuestion')}</label>
     <div class="choice-group">
-      ${WEEKDAYS.map(d => `<div class="choice ${f.activeDays.has(d.key)?'selected':''}" data-toggle-day="${d.key}">${d.label}</div>`).join('')}
+      ${WEEKDAYS.map(d => `<div class="choice ${f.activeDays.has(d.key)?'selected':''}" data-toggle-day="${d.key}">${t(d.labelKey)}</div>`).join('')}
     </div>
   </div>
   `;
@@ -839,26 +1215,26 @@ function assessmentStep4(){
   const cycleDays = f.cycleDays || suggestedCycle;
   const juzPerDay = juzPerDayForCycle(approxJuz, cycleDays);
   return `
-  <h2>Murajaah</h2>
-  <p class="muted">Ini mengekalkan hafalan anda &mdash; bahagian paling penting.</p>
+  <h2>${t('step4Title')}</h2>
+  <p class="muted">${t('step4Desc')}</p>
   <div class="field">
-    <label>Berapa banyak masa untuk murajaah setiap hari?</label>
+    <label>${t('step4CapacityQuestion')}</label>
     <div class="choice-group">
-      ${CAPACITY_PRESETS.map(c => `<div class="choice ${f.capacity===c.key?'selected':''}" data-set-assess="capacity:${c.key}">${c.label} <span class="muted">(${c.hint})</span></div>`).join('')}
-      <div class="choice ${![0.5,1,2].includes(f.capacity)?'selected':''}" data-set-assess="capacity:custom">Custom</div>
+      ${CAPACITY_PRESETS.map(c => `<div class="choice ${f.capacity===c.key?'selected':''}" data-set-assess="capacity:${c.key}">${t(c.labelKey)} <span class="muted">${t(c.hintKey)}</span></div>`).join('')}
+      <div class="choice ${![0.5,1,2].includes(f.capacity)?'selected':''}" data-set-assess="capacity:custom">${t('step2Custom')}</div>
     </div>
-    ${![0.5,1,2].includes(f.capacity) ? `<div class="field" style="margin-top:12px;"><label>Juz sehari (custom)</label><input type="number" min="0.5" step="0.5" data-form-field="capacity" value="${f.capacity}"></div>` : ''}
+    ${![0.5,1,2].includes(f.capacity) ? `<div class="field" style="margin-top:12px;"><label>${t('step4CapacityCustomLabel')}</label><input type="number" min="0.5" step="0.5" data-form-field="capacity" value="${f.capacity}"></div>` : ''}
   </div>
   <div class="field">
-    <label>Bilakah anda mahu satu kitaran murajaah lengkap selesai?</label>
+    <label>${t('step4CycleQuestion')}</label>
     <div class="choice-group">
-      ${CYCLE_PRESETS.map(c => `<div class="choice ${f.cycleDays===c?'selected':''}" data-set-assess="cycleDays:${c}">${c} hari</div>`).join('')}
-      <div class="choice ${!CYCLE_PRESETS.includes(f.cycleDays)?'selected':''}" data-set-assess="cycleDays:custom">Custom</div>
+      ${CYCLE_PRESETS.map(c => `<div class="choice ${f.cycleDays===c?'selected':''}" data-set-assess="cycleDays:${c}">${t('step4CycleDaysOption',{n:c})}</div>`).join('')}
+      <div class="choice ${!CYCLE_PRESETS.includes(f.cycleDays)?'selected':''}" data-set-assess="cycleDays:custom">${t('step2Custom')}</div>
     </div>
     ${!CYCLE_PRESETS.includes(f.cycleDays) ? `<div class="field" style="margin-top:12px;"><input type="number" min="3" max="30" data-form-field="cycleDays" value="${f.cycleDays}"></div>` : ''}
   </div>
   <div class="card">
-    <p class="muted" style="margin:0;">Berdasarkan kira-kira ${approxJuz} Juzuk yang telah dihafal, ini bermaksud kira-kira <strong>${juzPerDay} Juz sehari</strong> untuk kitaran ${cycleDays} hari.</p>
+    <p class="muted" style="margin:0;">${t('step4SummaryCard', {juz:approxJuz, perDay:juzPerDay, cycle:cycleDays})}</p>
   </div>
   `;
 }
@@ -869,22 +1245,22 @@ function recommendationHtml(){
   const approxJuz = approxJuzFromSelection(f.baselineSelection);
   const cycleDays = f.cycleDays || suggestCycleDays(approxJuz, f.capacity);
   const juzPerDay = juzPerDayForCycle(approxJuz, cycleDays);
-  const paceLabel = f.pageFraction==='custom' ? (f.customAyat ? `${f.customAyat} ayat` : `${f.customPages||1} halaman`) : (f.pageFraction===0.25?'&frac14; halaman':f.pageFraction===1?'1 halaman':'&frac12; halaman');
-  const timeLabel = f.preferredTime ? (TIME_OPTIONS.find(t=>t.key===f.preferredTime)||{}).label : '&mdash;';
-  const daysLabel = [...f.activeDays].map(k => (WEEKDAYS.find(d=>d.key===k)||{}).label).join(', ') || '&mdash;';
+  const paceLabel = f.pageFraction==='custom' ? (f.customAyat ? t('calAyatCustom',{n:f.customAyat}) : t('calPageCustom',{n:f.customPages||1})) : (f.pageFraction===0.25?t('step2QuarterPage'):f.pageFraction===1?t('step2OnePage'):t('step2HalfPage'));
+  const timeLabel = f.preferredTime ? t((TIME_OPTIONS.find(o=>o.key===f.preferredTime)||{}).labelKey) : '&mdash;';
+  const daysLabel = [...f.activeDays].map(k => t((WEEKDAYS.find(d=>d.key===k)||{}).labelKey)).join(', ') || '&mdash;';
 
   return `
-  <h2>Cadangan Rancangan Hifz Anda</h2>
-  <p class="muted">Ini adalah cadangan berdasarkan jawapan anda &mdash; bukan peraturan tetap. Anda boleh ubah bila-bila masa.</p>
+  <h2>${t('recTitle')}</h2>
+  <p class="muted">${t('recDesc')}</p>
   <div class="card" style="margin-top:16px;">
-    <div class="detail-row"><span>&#127793; Hafalan Baru</span><span><strong>${paceLabel}</strong> &middot; ${f.hafalanDaysPerWeek} hari/minggu</span></div>
-    <div class="detail-row"><span>&#128260; Murajaah</span><span><strong>${juzPerDay} Juz sehari</strong> &middot; ${cycleDays} hari/kitaran</span></div>
-    <div class="detail-row"><span>&#128337; Masa</span><span>${timeLabel}</span></div>
-    <div class="detail-row"><span>&#128197; Hari Aktif</span><span>${daysLabel}</span></div>
+    <div class="detail-row"><span>&#127793; ${t('recHafalanBaru')}</span><span><strong>${paceLabel}</strong> &middot; ${t('recPerWeek',{n:f.hafalanDaysPerWeek})}</span></div>
+    <div class="detail-row"><span>&#128260; ${t('recMurajaah')}</span><span><strong>${t('recJuzPerDay',{n:juzPerDay})}</strong> &middot; ${t('recPerCycle',{n:cycleDays})}</span></div>
+    <div class="detail-row"><span>&#128337; ${t('recMasa')}</span><span>${timeLabel}</span></div>
+    <div class="detail-row"><span>&#128197; ${t('recHariAktif')}</span><span>${daysLabel}</span></div>
   </div>
   <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
-    <button class="btn btn-primary" data-action="accept-recommendation">Gunakan Cadangan</button>
-    <button class="btn btn-secondary" data-action="adjust-recommendation">Ubah Rancangan</button>
+    <button class="btn btn-primary" data-action="accept-recommendation">${t('recAccept')}</button>
+    <button class="btn btn-secondary" data-action="adjust-recommendation">${t('recAdjust')}</button>
   </div>
   `;
 }
@@ -897,24 +1273,24 @@ function utamaHtml(){
 
   if(todayDone){
     return `
-    <h2>Utama</h2>
+    <h2>${t('utamaTitle')}</h2>
     <div class="streak-strip">
-      <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">Hari Berterusan</div></div>
-      <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">Al-Quran Dihafal</div></div>
-      <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">Rekod Terbaik</div></div>
+      <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">${t('streakCurrent')}</div></div>
+      <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">${t('streakPct')}</div></div>
+      <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">${t('streakLongest')}</div></div>
     </div>
     <div class="all-done-card">
-      <h2>Hari Ini Selesai</h2>
-      <p>Hafalan baru dan murajaah hari ini telah dicatat. Teruskan esok.</p>
+      <h2>${t('allDoneTitle')}</h2>
+      <p>${t('allDoneDesc')}</p>
     </div>`;
   }
 
   return `
-  <h2>Utama</h2>
+  <h2>${t('utamaTitle')}</h2>
   <div class="streak-strip">
-    <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">Hari Berterusan</div></div>
-    <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">Al-Quran Dihafal</div></div>
-    <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">Rekod Terbaik</div></div>
+    <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">${t('streakCurrent')}</div></div>
+    <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">${t('streakPct')}</div></div>
+    <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">${t('streakLongest')}</div></div>
   </div>
   ${newCardHtml()}
   ${murajaahCardHtml()}
@@ -925,37 +1301,37 @@ function newCardHtml(){
   const sug = computeSuggestedNew();
   const doneToday = PROGRESS.entries.some(e => e.date===todayStr() && e.type==='new');
   if(!sug){
-    return `<div class="due-card empty"><div class="dctitle">&#127793; Hafalan Baru</div><div class="dcbody">Al-Quran telah selesai dihafal sepenuhnya.</div></div>`;
+    return `<div class="due-card empty"><div class="dctitle">${t('newCardTitle')}</div><div class="dcbody">${t('newCardFullyDone')}</div></div>`;
   }
   const surah = getSurah(sug.surah);
   if(doneToday){
-    return `<div class="due-card done"><div class="dctitle">&#127793; Hafalan Baru Hari Ini</div><div class="dc-check">&#10003; Sudah dicatat hari ini</div></div>`;
+    return `<div class="due-card done"><div class="dctitle">${t('newCardTitleToday')}</div><div class="dc-check">${t('newCardDoneToday')}</div></div>`;
   }
   return `
   <div class="due-card">
-    <div class="dctitle">&#127793; Hafalan Baru Hari Ini</div>
-    <div class="dcbody">Sambung dari <strong>${escapeHtml(surah.name)}, ayat ${sug.ayahFrom}</strong><br><span class="muted">Cadangan: hingga ayat ${sug.ayahToSuggested}</span></div>
-    <button class="btn btn-accent btn-sm" data-action="log-new">Log Hafalan Baru</button>
+    <div class="dctitle">${t('newCardTitleToday')}</div>
+    <div class="dcbody">${t('newCardContinueFrom', {surah: escapeHtml(surah.name), ayah: sug.ayahFrom, to: sug.ayahToSuggested})}</div>
+    <button class="btn btn-accent btn-sm" data-action="log-new">${t('newCardButton')}</button>
   </div>`;
 }
 
 function murajaahCardHtml(){
   const m = computeTodaysMurajaah();
   if(!m.active){
-    return `<div class="due-card empty"><div class="dctitle">&#128260; Murajaah Hari Ini</div><div class="dcbody muted">Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah.</div></div>`;
+    return `<div class="due-card empty"><div class="dctitle">${t('murajaahCardTitle')}</div><div class="dcbody muted">${t('murajaahCardInactive')}</div></div>`;
   }
   if(m.doneToday){
-    return `<div class="due-card done"><div class="dctitle">&#128260; Murajaah Hari Ini</div><div class="dc-check">&#10003; Sudah dicatat hari ini</div>
-      <div class="muted" style="margin-top:8px;">Hari ${m.dayInCycle+1} daripada ${m.cycleDays} &middot; ${m.completedThisCycle}/${m.totalJuz} Juz selesai kitaran ini</div></div>`;
+    return `<div class="due-card done"><div class="dctitle">${t('murajaahCardTitle')}</div><div class="dc-check">${t('murajaahCardDoneToday')}</div>
+      <div class="muted" style="margin-top:8px;">${t('murajaahCardCycleProgress',{day:m.dayInCycle+1, total:m.cycleDays, done:m.completedThisCycle, all:m.totalJuz})}</div></div>`;
   }
-  const juzLabel = m.dueJuz.map(j => 'Juz '+j).join(', ');
+  const juzLabel = t('juzListLabel', {list: m.dueJuz.map(j => t('positionJuz',{n:j})).join(', ')});
   return `
   <div class="due-card">
-    <div class="dctitle">&#128260; Murajaah Hari Ini</div>
+    <div class="dctitle">${t('murajaahCardTitle')}</div>
     <div class="dcbody"><strong>${juzLabel}</strong><br>
-      <span class="muted">Hari ${m.dayInCycle+1} daripada ${m.cycleDays} &middot; ${m.completedThisCycle}/${m.totalJuz} Juz selesai kitaran ini</span></div>
-    ${m.bonusWeak.length ? `<div class="muted" style="margin-bottom:10px;">Tambahan (jika sempat): ${escapeHtml(m.bonusWeak.join(', '))}</div>` : ''}
-    <button class="btn btn-accent btn-sm" data-action="log-murajaah" data-juz="${m.dueJuz[0]}">Log Murajaah</button>
+      <span class="muted">${t('murajaahCardCycleProgress',{day:m.dayInCycle+1, total:m.cycleDays, done:m.completedThisCycle, all:m.totalJuz})}</span></div>
+    ${m.bonusWeak.length ? `<div class="muted" style="margin-bottom:10px;">${t('murajaahCardBonus',{list: escapeHtml(m.bonusWeak.join(', '))})}</div>` : ''}
+    <button class="btn btn-accent btn-sm" data-action="log-murajaah" data-juz="${m.dueJuz[0]}">${t('murajaahCardButton')}</button>
   </div>`;
 }
 
@@ -980,13 +1356,13 @@ function hifzProgressDashHtml(){
   const pct = percentMemorised();
   return `
   <div class="dash-section">
-    <h3>&#128214; Kemajuan Hifz</h3>
+    <h3>${t('dashHifzProgress')}</h3>
     <div class="dash-card">
       <div class="ring-wrap">
         ${ringSvg(pct)}
         <div class="ring-stats">
-          <div class="ring-big">${juzCount} <span style="font-size:16px;color:var(--olive);">/ 30 Juz</span></div>
-          <div class="ring-sub">${pct}% daripada keseluruhan Al-Quran</div>
+          <div class="ring-big">${t('dashJuzOf30',{n:juzCount})}</div>
+          <div class="ring-sub">${t('dashPctOfQuran',{pct})}</div>
         </div>
       </div>
     </div>
@@ -999,8 +1375,8 @@ function murajaahCycleDashHtml(){
   if(!m.active){
     return `
     <div class="dash-section">
-      <h3>&#128260; Kitaran Murajaah</h3>
-      <div class="dash-card prominent"><p class="muted" style="margin:0;">Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah lagi.</p></div>
+      <h3>${t('dashMurajaahCycle')}</h3>
+      <div class="dash-card prominent"><p class="muted" style="margin:0;">${t('dashMurajaahInactive')}</p></div>
     </div>`;
   }
   const remaining = m.totalJuz - m.completedThisCycle;
@@ -1009,13 +1385,13 @@ function murajaahCycleDashHtml(){
   const fillPct = m.totalJuz ? Math.round((m.completedThisCycle/m.totalJuz)*100) : 0;
   return `
   <div class="dash-section">
-    <h3>&#128260; Kitaran Murajaah</h3>
+    <h3>${t('dashMurajaahCycle')}</h3>
     <div class="dash-card prominent">
-      <div class="stat-row" style="margin-top:0;"><span>Kemajuan kitaran</span><strong>${m.completedThisCycle}/${m.totalJuz} Juz selesai</strong></div>
+      <div class="stat-row" style="margin-top:0;"><span>${t('dashCycleProgress')}</span><strong>${t('dashCycleProgressVal',{done:m.completedThisCycle, all:m.totalJuz})}</strong></div>
       <div class="bar-track"><div class="bar-fill green" style="width:${fillPct}%;"></div></div>
-      <div class="stat-row"><span>Baki Juzuk</span><strong>${remaining} Juz</strong></div>
-      <div class="stat-row"><span>Sasaran harian</span><strong>${dailyTarget} Juz/hari</strong></div>
-      <div class="stat-row"><span>Anggaran hari berbaki</span><strong>${daysRemaining} hari</strong></div>
+      <div class="stat-row"><span>${t('dashRemainingJuz')}</span><strong>${t('dashRemainingJuzVal',{n:remaining})}</strong></div>
+      <div class="stat-row"><span>${t('dashDailyTarget')}</span><strong>${t('dashDailyTargetVal',{n:dailyTarget})}</strong></div>
+      <div class="stat-row"><span>${t('dashDaysRemaining')}</span><strong>${t('dashDaysRemainingVal',{n:daysRemaining})}</strong></div>
     </div>
   </div>`;
 }
@@ -1023,14 +1399,12 @@ function murajaahCycleDashHtml(){
 function hafalanBaruDashHtml(){
   const sug = computeSuggestedNew();
   const p = PROGRESS.plan;
-  const paceLabel = p.paceTarget.pageFraction==='custom'
-    ? (p.paceTarget.customAyat ? `${p.paceTarget.customAyat} ayat` : `${p.paceTarget.customPages||1} halaman`)
-    : (p.paceTarget.pageFraction===0.25?'&frac14; halaman':p.paceTarget.pageFraction===1?'1 halaman':'&frac12; halaman');
+  const paceLabel = calPaceLabel(p.paceTarget);
   if(!sug){
     return `
     <div class="dash-section">
-      <h3>&#127793; Hafalan Baru</h3>
-      <div class="dash-card"><p class="muted" style="margin:0;">Al-Quran telah selesai dihafal sepenuhnya.</p></div>
+      <h3>${t('dashHafalanBaru')}</h3>
+      <div class="dash-card"><p class="muted" style="margin:0;">${t('dashQuranFullyDone')}</p></div>
     </div>`;
   }
   const surah = getSurah(sug.surah);
@@ -1038,12 +1412,12 @@ function hafalanBaruDashHtml(){
   const fillPct = Math.round(((st.memorisedUpTo||0)/surah.totalAyah)*100);
   return `
   <div class="dash-section">
-    <h3>&#127793; Hafalan Baru</h3>
+    <h3>${t('dashHafalanBaru')}</h3>
     <div class="dash-card">
-      <div class="stat-row" style="margin-top:0;"><span>Titik permulaan</span><strong>${positionPointerLabel()}</strong></div>
+      <div class="stat-row" style="margin-top:0;"><span>${t('dashStartingPoint')}</span><strong>${positionPointerLabel()}</strong></div>
       <div class="bar-track"><div class="bar-fill gold" style="width:${fillPct}%;"></div></div>
-      <div class="stat-row"><span>Kemajuan dalam ${escapeHtml(surah.name)}</span><strong>${st.memorisedUpTo||0}/${surah.totalAyah} ayat</strong></div>
-      <div class="stat-row"><span>Sasaran harian</span><strong>${paceLabel}</strong></div>
+      <div class="stat-row"><span>${t('dashProgressIn',{surah:escapeHtml(surah.name)})}</span><strong>${t('dashProgressInVal',{done:st.memorisedUpTo||0, total:surah.totalAyah})}</strong></div>
+      <div class="stat-row"><span>${t('dashDailyTargetPace')}</span><strong>${paceLabel}</strong></div>
     </div>
   </div>`;
 }
@@ -1051,33 +1425,32 @@ function hafalanBaruDashHtml(){
 function weeklyPlanDashHtml(){
   const p = PROGRESS.plan;
   const active = new Set(p.activeDays||[]);
-  const dayShort = { isnin:'Isn', selasa:'Sel', rabu:'Rab', khamis:'Kha', jumaat:'Jum', sabtu:'Sab', ahad:'Ahd' };
   const cells = WEEKDAYS.map(d => {
     const isActive = active.has(d.key);
     return `<div class="day-card ${isActive?'active':''}" data-day-detail="${d.key}">
-      <div class="dname">${dayShort[d.key]}</div>
+      <div class="dname">${t(d.shortKey)}</div>
       <div class="ddot">${isActive ? '&#9679;' : '&mdash;'}</div>
     </div>`;
   }).join('');
   return `
   <div class="dash-section">
-    <h3>&#128197; Rancangan Mingguan</h3>
+    <h3>${t('dashWeeklyPlan')}</h3>
     <div class="dash-card">
       <div class="week-grid">${cells}</div>
-      <p class="muted" style="margin:10px 0 0;">Ketik hari untuk lihat butiran. Murajaah berlaku setiap hari aktif.</p>
-      <button class="btn btn-secondary btn-block" style="margin-top:14px;" data-action="calendar-choice">&#65291; Tambah ke Kalendar</button>
+      <p class="muted" style="margin:10px 0 0;">${t('dashWeeklyPlanHint')}</p>
+      <button class="btn btn-secondary btn-block" style="margin-top:14px;" data-action="calendar-choice">${t('dashAddToCalendar')}</button>
     </div>
   </div>`;
 }
 
 function rancangHtml(){
   return `
-  <h2>Rancangan Hifz Anda</h2>
+  <h2>${t('rancangTitle')}</h2>
   ${hifzProgressDashHtml()}
   ${murajaahCycleDashHtml()}
   ${hafalanBaruDashHtml()}
   ${weeklyPlanDashHtml()}
-  <button class="btn btn-primary btn-block" data-action="edit-plan">Ubah Rancangan</button>
+  <button class="btn btn-primary btn-block" data-action="edit-plan">${t('editPlan')}</button>
   `;
 }
 
@@ -1092,13 +1465,13 @@ function petaHifzHtml(){
     </div>`;
   }).join('');
   return `
-  <h2>Peta Hifz</h2>
-  <p class="muted">Ketik mana-mana surah untuk lihat butiran.</p>
+  <h2>${t('petaTitle')}</h2>
+  <p class="muted">${t('petaDesc')}</p>
   <div class="legend">
-    <span><span class="legend-dot" style="background:var(--ivory);border:1px solid var(--border-beige);"></span>Belum Bermula</span>
-    <span><span class="legend-dot" style="background:var(--soft-gold);"></span>Sedang Dihafal</span>
-    <span><span class="legend-dot" style="background:var(--deep-green);"></span>Dihafal</span>
-    <span><span class="legend-dot" style="background:var(--amber);"></span>Perlu Perhatian</span>
+    <span><span class="legend-dot" style="background:var(--ivory);border:1px solid var(--border-beige);"></span>${t('legendNotStarted')}</span>
+    <span><span class="legend-dot" style="background:var(--soft-gold);"></span>${t('legendInProgress')}</span>
+    <span><span class="legend-dot" style="background:var(--deep-green);"></span>${t('legendMemorised')}</span>
+    <span><span class="legend-dot" style="background:var(--amber);"></span>${t('legendNeedsAttention')}</span>
   </div>
   <div class="hifz-grid">${cells}</div>
   `;
@@ -1106,32 +1479,32 @@ function petaHifzHtml(){
 
 // ===================== RIWAYAT =====================
 function riwayatHtml(){
-  const filters = [ {key:'all', label:'Semua'}, {key:'new', label:'Hafalan Baru'}, {key:'murajaah', label:'Murajaah'} ];
+  const filters = [ {key:'all', labelKey:'filterAll'}, {key:'new', labelKey:'filterNew'}, {key:'murajaah', labelKey:'filterMurajaah'} ];
   const filtered = PROGRESS.entries
     .filter(e => STATE.riwayatFilter==='all' || e.type===STATE.riwayatFilter)
     .slice().sort((a,b) => b.date.localeCompare(a.date) || (b.id>a.id?1:-1));
 
   const rows = filtered.map(e => {
     const mainLabel = e.type==='new'
-      ? `<strong>${escapeHtml(getSurah(e.surah)?.name||('Surah '+e.surah))}</strong> ayat ${e.ayahFrom}&ndash;${e.ayahTo}`
-      : `<strong>Juz ${e.juz}</strong>`;
+      ? `<strong>${escapeHtml(getSurah(e.surah)?.name||('Surah '+e.surah))}</strong> ${t('riwayatAyahRange',{from:e.ayahFrom, to:e.ayahTo})}`
+      : `<strong>${t('riwayatJuz',{n:e.juz})}</strong>`;
     return `
     <div class="entry-row">
       <div class="entry-main">
         <div class="entry-date">${e.date}</div>
-        <div>${mainLabel} <span class="rating-tag ${e.rating}">${RATING_LABELS[e.rating]||''}</span></div>
+        <div>${mainLabel} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating]||'')}</span></div>
         ${e.note ? `<div class="muted">${escapeHtml(e.note)}</div>` : ''}
       </div>
-      <div class="type-badge ${e.type}">${e.type==='new'?'Hafalan Baru':'Murajaah'}</div>
+      <div class="type-badge ${e.type}">${e.type==='new'?t('entryTypeNew'):t('entryTypeMurajaah')}</div>
     </div>`;
   }).join('');
 
   return `
-  <h2>Riwayat</h2>
+  <h2>${t('riwayatTitle')}</h2>
   <div class="filter-row">
-    ${filters.map(f => `<div class="choice ${STATE.riwayatFilter===f.key?'selected':''}" data-set-filter="${f.key}">${f.label}</div>`).join('')}
+    ${filters.map(f => `<div class="choice ${STATE.riwayatFilter===f.key?'selected':''}" data-set-filter="${f.key}">${t(f.labelKey)}</div>`).join('')}
   </div>
-  ${filtered.length ? `<div class="card">${rows}</div>` : `<div class="empty-state">Tiada rekod lagi.</div>`}
+  ${filtered.length ? `<div class="card">${rows}</div>` : `<div class="empty-state">${t('riwayatEmpty')}</div>`}
   `;
 }
 
@@ -1148,10 +1521,10 @@ function modalHtml(){
 }
 
 function surahSelectOptions(selected){
-  return SURAHS.map(s => `<option value="${s.no}" ${s.no===selected?'selected':''}>${s.no}. ${escapeHtml(s.name)} (${s.totalAyah} ayat)</option>`).join('');
+  return SURAHS.map(s => `<option value="${s.no}" ${s.no===selected?'selected':''}>${s.no}. ${escapeHtml(s.name)} (${s.totalAyah} ${t('ayahWord')})</option>`).join('');
 }
 function juzSelectOptions(selected, list){
-  return list.map(j => `<option value="${j}" ${j===selected?'selected':''}>Juz ${j}</option>`).join('');
+  return list.map(j => `<option value="${j}" ${j===selected?'selected':''}>${t('positionJuz',{n:j})}</option>`).join('');
 }
 
 function logNewModalHtml(){
@@ -1163,17 +1536,17 @@ function logNewModalHtml(){
   return `
   <div class="modal-overlay" data-close-modal="1">
     <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">Log Hafalan Baru</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      <div class="field"><label>Surah</label><select id="logSurahSelect" data-modal-field="surah">${surahSelectOptions(surahNo)}</select></div>
+      <div class="modal-header"><h3 style="margin:0;">${t('modalLogNewTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+      <div class="field"><label>${t('fieldSurah')}</label><select id="logSurahSelect" data-modal-field="surah">${surahSelectOptions(surahNo)}</select></div>
       <div class="row2">
-        <div class="field"><label>Ayat Dari</label><input type="number" min="1" max="${surah.totalAyah}" id="logAyahFrom" data-modal-field="ayahFrom" value="${ayahFrom}"></div>
-        <div class="field"><label>Ayat Hingga</label><input type="number" min="1" max="${surah.totalAyah}" id="logAyahTo" data-modal-field="ayahTo" value="${ayahTo}"></div>
+        <div class="field"><label>${t('fieldAyahFrom')}</label><input type="number" min="1" max="${surah.totalAyah}" id="logAyahFrom" data-modal-field="ayahFrom" value="${ayahFrom}"></div>
+        <div class="field"><label>${t('fieldAyahTo')}</label><input type="number" min="1" max="${surah.totalAyah}" id="logAyahTo" data-modal-field="ayahTo" value="${ayahTo}"></div>
       </div>
-      <div class="field"><label>Kualiti</label>
-        <div class="rating-group">${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${RATING_LABELS[r]}</div>`).join('')}</div>
+      <div class="field"><label>${t('fieldQuality')}</label>
+        <div class="rating-group">${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${t(RATING_LABEL_KEYS[r])}</div>`).join('')}</div>
       </div>
-      <div class="field"><label>Nota (Pilihan)</label><textarea id="logNote" data-modal-field="note" placeholder="cth: keliru dengan ayat lain...">${escapeHtml(m.note||'')}</textarea></div>
-      <button class="btn btn-primary btn-block" data-action="submit-log-new">Simpan</button>
+      <div class="field"><label>${t('fieldNoteOptional')}</label><textarea id="logNote" data-modal-field="note" placeholder="${t('notePlaceholder')}">${escapeHtml(m.note||'')}</textarea></div>
+      <button class="btn btn-primary btn-block" data-action="submit-log-new">${t('btnSave')}</button>
     </div>
   </div>`;
 }
@@ -1185,13 +1558,13 @@ function logMurajaahModalHtml(){
   return `
   <div class="modal-overlay" data-close-modal="1">
     <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">Log Murajaah</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      <div class="field"><label>Juzuk</label><select id="logJuzSelect" data-modal-field="juz">${juzSelectOptions(juzNo, juzList)}</select></div>
-      <div class="field"><label>Kualiti</label>
-        <div class="rating-group">${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${RATING_LABELS[r]}</div>`).join('')}</div>
+      <div class="modal-header"><h3 style="margin:0;">${t('modalLogMurajaahTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+      <div class="field"><label>${t('fieldJuzuk')}</label><select id="logJuzSelect" data-modal-field="juz">${juzSelectOptions(juzNo, juzList)}</select></div>
+      <div class="field"><label>${t('fieldQuality')}</label>
+        <div class="rating-group">${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${t(RATING_LABEL_KEYS[r])}</div>`).join('')}</div>
       </div>
-      <div class="field"><label>Nota (Pilihan)</label><textarea id="logNote" data-modal-field="note" placeholder="cth: keliru dengan ayat lain...">${escapeHtml(m.note||'')}</textarea></div>
-      <button class="btn btn-primary btn-block" data-action="submit-log-murajaah">Simpan</button>
+      <div class="field"><label>${t('fieldNoteOptional')}</label><textarea id="logNote" data-modal-field="note" placeholder="${t('notePlaceholder')}">${escapeHtml(m.note||'')}</textarea></div>
+      <button class="btn btn-primary btn-block" data-action="submit-log-murajaah">${t('btnSave')}</button>
     </div>
   </div>`;
 }
@@ -1202,7 +1575,7 @@ function calendarChoiceModalHtml(){
     return `
     <div class="modal-overlay" data-close-modal="1">
       <div class="modal-sheet" data-stop-propagation="1">
-        <div class="modal-header"><h3 style="margin:0;">Tambah ke Kalendar</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+        <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
         <p class="muted">${escapeHtml(hafalanResult.reason)}</p>
       </div>
     </div>`;
@@ -1211,15 +1584,15 @@ function calendarChoiceModalHtml(){
   return `
   <div class="modal-overlay" data-close-modal="1">
     <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">Tambah ke Kalendar</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      <p class="muted">Google Calendar hanya boleh tambah satu acara berulang pada satu masa. Pilih yang mana dahulu &mdash; anda boleh tambah yang satu lagi selepas ini.</p>
+      <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+      <p class="muted">${t('calendarChooseOne')}</p>
       <div class="due-card" style="margin-top:14px;cursor:pointer;" data-open-gcal="hafalan">
         <div class="dctitle">&#127793; ${escapeHtml(hafalanResult.title)}</div>
-        <div class="dcbody muted">Buka Google Calendar dalam tab baharu</div>
+        <div class="dcbody muted">${t('calendarOpenNewTab')}</div>
       </div>
       <div class="due-card" data-open-gcal="murajaah" style="cursor:pointer;">
         <div class="dctitle">&#128260; ${escapeHtml(murajaahResult.title)}</div>
-        <div class="dcbody muted">Buka Google Calendar dalam tab baharu</div>
+        <div class="dcbody muted">${t('calendarOpenNewTab')}</div>
       </div>
     </div>
   </div>`;
@@ -1230,21 +1603,19 @@ function dayDetailModalHtml(){
   const day = WEEKDAYS.find(d => d.key === key);
   const p = PROGRESS.plan;
   const isActive = (p.activeDays||[]).includes(key);
-  const paceLabel = p.paceTarget.pageFraction==='custom'
-    ? (p.paceTarget.customAyat ? `${p.paceTarget.customAyat} ayat` : `${p.paceTarget.customPages||1} halaman`)
-    : (p.paceTarget.pageFraction===0.25?'&frac14; halaman':p.paceTarget.pageFraction===1?'1 halaman':'&frac12; halaman');
+  const paceLabel = calPaceLabel(p.paceTarget);
   const juzCount = memorisedJuzList().length;
   const dailyMurajaahTarget = juzPerDayForCycle(juzCount, p.murajaahCycleDays);
-  const timeLabel = p.preferredTime ? (TIME_OPTIONS.find(t=>t.key===p.preferredTime)||{}).label : '&mdash;';
+  const timeLabel = p.preferredTime ? t((TIME_OPTIONS.find(o=>o.key===p.preferredTime)||{}).labelKey) : '&mdash;';
 
   return `
   <div class="modal-overlay" data-close-modal="1">
     <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${day.label}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      ${!isActive ? `<p class="muted">Bukan hari aktif dalam rancangan anda.</p>` : `
-      <div class="detail-row"><span class="muted">&#127793; Hafalan Baru</span><span>${paceLabel}</span></div>
-      <div class="detail-row"><span class="muted">&#128260; Murajaah</span><span>${juzCount>0 ? dailyMurajaahTarget+' Juz' : '&mdash;'}</span></div>
-      <div class="detail-row"><span class="muted">&#128337; Masa</span><span>${timeLabel}</span></div>
+      <div class="modal-header"><h3 style="margin:0;">${t(day.labelKey)}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+      ${!isActive ? `<p class="muted">${t('dayDetailInactive')}</p>` : `
+      <div class="detail-row"><span class="muted">${t('dayDetailHafalanBaru')}</span><span>${paceLabel}</span></div>
+      <div class="detail-row"><span class="muted">${t('dayDetailMurajaah')}</span><span>${juzCount>0 ? t('dashDailyTargetVal',{n:dailyMurajaahTarget}) : '&mdash;'}</span></div>
+      <div class="detail-row"><span class="muted">${t('dayDetailMasa')}</span><span>${timeLabel}</span></div>
       `}
     </div>
   </div>`;
@@ -1254,7 +1625,8 @@ function surahDetailModalHtml(){
   const no = STATE.modal.surahNo;
   const s = getSurah(no);
   const st = getSurahStatus(no);
-  const statusLabel = {not_started:'Belum Bermula', in_progress:'Sedang Dihafal', memorised:'Dihafal'}[st.status] || st.status;
+  const statusLabelKeys = {not_started:'statusNotStarted', in_progress:'statusInProgress', memorised:'statusMemorised'};
+  const statusLabel = t(statusLabelKeys[st.status] || st.status);
   const history = PROGRESS.entries.filter(e => (e.type==='new' && e.surah===no) || (e.type==='murajaah' && juzBadgesForSurah(no).length && JUZ_SURAH_SPANS[e.juz] && JUZ_SURAH_SPANS[e.juz].some(sp=>sp.surah===no)))
     .slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
 
@@ -1262,18 +1634,18 @@ function surahDetailModalHtml(){
   <div class="modal-overlay" data-close-modal="1">
     <div class="modal-sheet" data-stop-propagation="1">
       <div class="modal-header"><h3 style="margin:0;">${escapeHtml(s.name)}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      <div class="detail-row"><span class="muted">Jumlah Ayat</span><span>${s.totalAyah}</span></div>
-      <div class="detail-row"><span class="muted">Status</span><span>${statusLabel}</span></div>
-      <div class="detail-row"><span class="muted">Dihafal Hingga Ayat</span><span>${st.memorisedUpTo||0}</span></div>
-      <div class="detail-row"><span class="muted">Kualiti Terakhir</span><span>${st.lastRating?RATING_LABELS[st.lastRating]:'&mdash;'}</span></div>
-      <div class="detail-row"><span class="muted">Tarikh Terakhir</span><span>${st.lastRevisedDate||'&mdash;'}</span></div>
+      <div class="detail-row"><span class="muted">${t('surahDetailTotalAyah')}</span><span>${s.totalAyah}</span></div>
+      <div class="detail-row"><span class="muted">${t('surahDetailStatus')}</span><span>${statusLabel}</span></div>
+      <div class="detail-row"><span class="muted">${t('surahDetailMemorisedUpTo')}</span><span>${st.memorisedUpTo||0}</span></div>
+      <div class="detail-row"><span class="muted">${t('surahDetailLastQuality')}</span><span>${st.lastRating?t(RATING_LABEL_KEYS[st.lastRating]):'&mdash;'}</span></div>
+      <div class="detail-row"><span class="muted">${t('surahDetailLastDate')}</span><span>${st.lastRevisedDate||'&mdash;'}</span></div>
       ${history.length ? `
-      <h3 style="font-size:14px;margin-top:16px;">Sejarah Terkini</h3>
+      <h3 style="font-size:14px;margin-top:16px;">${t('surahDetailHistory')}</h3>
       ${history.map(e => e.type==='new'
-        ? `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>ayat ${e.ayahFrom}&ndash;${e.ayahTo} <span class="rating-tag ${e.rating}">${RATING_LABELS[e.rating]}</span></div><div class="type-badge new">Hafalan Baru</div></div>`
-        : `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>Murajaah Juz ${e.juz} <span class="rating-tag ${e.rating}">${RATING_LABELS[e.rating]}</span></div><div class="type-badge murajaah">Murajaah</div></div>`
+        ? `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>${t('surahDetailAyahRange',{from:e.ayahFrom, to:e.ayahTo})} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating])}</span></div><div class="type-badge new">${t('entryTypeNew')}</div></div>`
+        : `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>${t('surahDetailMurajaahJuz',{n:e.juz})} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating])}</span></div><div class="type-badge murajaah">${t('entryTypeMurajaah')}</div></div>`
       ).join('')}
-      ` : '<p class="muted" style="margin-top:14px;">Tiada rekod lagi untuk surah ini.</p>'}
+      ` : `<p class="muted" style="margin-top:14px;">${t('surahDetailNoHistory')}</p>`}
     </div>
   </div>`;
 }
@@ -1281,6 +1653,13 @@ function surahDetailModalHtml(){
 // ===================== Events =====================
 function bindEvents(){
   app.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => go(el.getAttribute('data-nav'))));
+
+  const langToggle = document.getElementById('langToggle');
+  if(langToggle) langToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-lang]');
+    if(!btn) return;
+    setLanguage(btn.getAttribute('data-lang'));
+  });
 
   // ---------- Home quick-log ----------
   const newBtn = app.querySelector('[data-action="log-new"]');
@@ -1435,7 +1814,7 @@ function bindEvents(){
 
     const submitNew = app.querySelector('[data-action="submit-log-new"]');
     if(submitNew) submitNew.addEventListener('click', () => {
-      if(!STATE.modal.rating){ alert('Sila pilih kualiti (Lemah / Sederhana / Lancar).'); return; }
+      if(!STATE.modal.rating){ alert(t('alertPickQuality')); return; }
       const surahEl = document.getElementById('logSurahSelect');
       const fromEl = document.getElementById('logAyahFrom');
       const toEl = document.getElementById('logAyahTo');
@@ -1444,16 +1823,16 @@ function bindEvents(){
       const ayahFrom = parseInt((fromEl?fromEl.value:STATE.modal.ayahFrom||STATE.modal.prefill.ayahFrom),10);
       const ayahTo = parseInt((toEl?toEl.value:STATE.modal.ayahTo||STATE.modal.prefill.ayahTo),10);
       const note = noteEl ? noteEl.value : (STATE.modal.note||'');
-      if(!ayahFrom || !ayahTo || ayahTo < ayahFrom){ alert('Sila semak julat ayat.'); return; }
+      if(!ayahFrom || !ayahTo || ayahTo < ayahFrom){ alert(t('alertCheckAyahRange')); return; }
       const surahRef = getSurah(surah);
-      if(ayahFrom < 1 || ayahTo > surahRef.totalAyah){ alert('Julat ayat di luar bilangan ayat surah ini.'); return; }
+      if(ayahFrom < 1 || ayahTo > surahRef.totalAyah){ alert(t('alertAyahOutOfRange')); return; }
       logEntry({ type:'new', surah, ayahFrom, ayahTo, rating: STATE.modal.rating, note });
       closeModal();
     });
 
     const submitMurajaah = app.querySelector('[data-action="submit-log-murajaah"]');
     if(submitMurajaah) submitMurajaah.addEventListener('click', () => {
-      if(!STATE.modal.rating){ alert('Sila pilih kualiti (Lemah / Sederhana / Lancar).'); return; }
+      if(!STATE.modal.rating){ alert(t('alertPickQuality')); return; }
       const juzEl = document.getElementById('logJuzSelect');
       const noteEl = document.getElementById('logNote');
       const juz = parseInt((juzEl?juzEl.value:STATE.modal.juz||STATE.modal.prefill.juz),10);
@@ -1465,6 +1844,7 @@ function bindEvents(){
 }
 
 // ===================== Init =====================
+document.documentElement.setAttribute('lang', LANG === 'en' ? 'en' : 'ms');
 render();
 
 </script>
