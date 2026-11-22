@@ -158,6 +158,34 @@ supplied screenshots, revealed with masks; the app's own "estimates … not a
 guarantee" line is included. The Results screen and the timeline / by-year
 screens come from different sessions and are kept in separate scenes.
 
+## HifzLab-Compiled — the full film
+
+`HifzLab-Compiled` (93 s, vertical) joins everything into one piece:
+opener ("Introducing Hifz Lab" + four products) → Batch 01–04 → finale
+("Four tools. One purpose." → QURRA Hifz Lab → Learn · Preserve · Grow).
+Each batch plays a trimmed range (`PARTS` in
+`src/compositions/compiled.timeline.ts`), dropping repeated logo intros and
+the per-product sign-offs so the film has a single ending. The opener's logo
+lands exactly where Batch 01's logo sits on its first used frame.
+
+**Sound**
+* Voice-over: the supplied ElevenLabs read, cut at its natural pauses into
+  five clips (`public/audio/vo/`) and placed on each product's entrance (`VO`).
+  The read has no Hifz Timeline line; Batch 04 plays under music and sound
+  design. Record that line as `public/audio/vo/vo-04b-timeline.wav` and render
+  with `--props='{"timelineVo":true}'` to place it on the Timeline icon.
+* Music bed + sound effects are original, synthesised by `tools/sfx_synth.py`
+  (`npm run sfx`): whooshes, page turns, chimes, shimmers, ticks, taps, pops,
+  swells and line sweeps. ~100 cues are mapped from each batch's own animation
+  timings (`SFX_CUES`). The bed ducks under narration.
+* Loudness is mastered to −14 LUFS / −1.5 dBTP by `tools/master_audio.sh`
+  after rendering (video stream copied).
+
+```bash
+npm run render:compiled-preview   # 810×1440 review copy, mastered
+npm run render:compiled-final     # full quality, mastered
+```
+
 ## Adding the next batch
 
 1. Create `src/compositions/<Name>.timeline.ts` (durations, poses, cues) and

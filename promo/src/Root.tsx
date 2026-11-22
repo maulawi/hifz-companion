@@ -1,6 +1,8 @@
 import React from 'react';
 import {Composition, Series} from 'remotion';
 import {BATCHES} from './compositions/batches';
+import {HifzLabCompiled} from './compositions/HifzLabCompiled';
+import {COMPILED_DURATION} from './compositions/compiled.timeline';
 import {canvas, formats} from './styles/brand';
 import {loadBrandFonts} from './styles/fonts';
 
@@ -40,6 +42,16 @@ export const RemotionRoot: React.FC = () => (
       fps={canvas.fps}
       width={canvas.width}
       height={canvas.height}
+    />
+    {/* The four batches as one film: opener, trimmed batches, single finale, VO + sound design */}
+    <Composition
+      id="HifzLab-Compiled"
+      component={HifzLabCompiled}
+      durationInFrames={COMPILED_DURATION}
+      fps={canvas.fps}
+      width={canvas.width}
+      height={canvas.height}
+      defaultProps={{timelineVo: false, music: true, sfx: true, voiceover: true}}
     />
   </>
 );
