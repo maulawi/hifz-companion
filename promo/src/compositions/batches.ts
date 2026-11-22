@@ -3,6 +3,8 @@ import {FormatId} from '../styles/brand';
 import {MutasyabihatChallenge} from './MutasyabihatChallenge';
 import {CHALLENGE_DURATION} from './challenge.timeline';
 import {HifzCompanion} from './HifzCompanion';
+import {HifzTimeline} from './HifzTimeline';
+import {TIMELINE_DURATION} from './timeline.timeline';
 import {COMPANION_DURATION} from './companion.timeline';
 import {EbookShowcase, ebookShowcaseDefaults} from './EbookShowcase';
 import {EBOOK_SHOWCASE_DURATION} from './ebookShowcase.timeline';
@@ -47,5 +49,11 @@ export const BATCHES: Batch[] = [
     durationInFrames: COMPANION_DURATION,
     format: 'vertical',
   },
-  // { id: 'Batch04-HifzTimeline', ... },
+  {
+    id: 'Batch04-HifzTimeline',
+    title: 'Hifz Timeline',
+    component: HifzTimeline,
+    durationInFrames: TIMELINE_DURATION,
+    format: 'vertical',
+  },
 ];

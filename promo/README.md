@@ -8,7 +8,7 @@ share one design system.
 | 01 · Mutashabihat Ebook | `Batch01-EbookShowcase` (26.9 s / 806 f) | Review (v2) |
 | 02 · Mutasyabihat Challenge | `Batch02-MutasyabihatChallenge` (30.0 s / 900 f) | Review |
 | 03 · Hifz Companion | `Batch03-HifzCompanion` (22.5 s / 675 f) | Review |
-| 04 · Hifz Timeline | — | not started |
+| 04 · Hifz Timeline | `Batch04-HifzTimeline` (23.0 s / 690 f) | Review |
 
 `HifzLab-FullPromo` plays every registered batch back to back.
 
@@ -146,6 +146,17 @@ timing in `src/compositions/companion.timeline.ts`, regions and sampled app
 colours in `src/data/companion.ts`. Shows selected moments only. New reusable
 pieces: `RingReveal` (animates a ring that exists in a screenshot by
 retracting a cover arc) and `CalendarMotif` (abstract day grid, no dates).
+
+## Batch 04 — Hifz Timeline
+
+Vertical 1080×1920 teaser, 23 s, five scenes in `src/scenes/timeline/`
+(TheQuestion, DailyCapacity, BuildTimeline, SeeEstimate, TimelineReveal);
+timing in `src/compositions/timeline.timeline.ts`, regions in
+`src/data/timeline.ts`. All values shown (½ page × 4d/wk, 2 pages/week,
+10 → 30, ~3.9 years, around October 2030, the 2027–2030 rows) are the
+supplied screenshots, revealed with masks; the app's own "estimates … not a
+guarantee" line is included. The Results screen and the timeline / by-year
+screens come from different sessions and are kept in separate scenes.
 
 ## Adding the next batch
 
