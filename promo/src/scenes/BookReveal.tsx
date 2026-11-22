@@ -8,7 +8,7 @@ import {assets} from '../data/assets';
 import {progress, settle} from '../lib/motion';
 import {colors, ease, type} from '../styles/brand';
 import {POSES, SCENES} from '../compositions/ebookShowcase.timeline';
-import {PrintedComparisonPage} from './PrintedComparisonPage';
+import {BookPage} from '../components/BookPage';
 
 const ENTER_DELAY = 8;
 
@@ -45,7 +45,7 @@ export const revealPose = (frame: number, fps: number): BookPose => {
 
 type TitleProps = {enterStart: number; exitStart?: number};
 
-/** Title lock-up under the book. Shared with scene 3, which plays its exit. */
+/** Title lock-up under the book. Shared with scene C, which plays its exit. */
 export const RevealTitle: React.FC<TitleProps> = ({enterStart, exitStart}) => {
   const frame = useCurrentFrame();
   const eyebrow = progress(frame, enterStart, 20, ease.out);
@@ -97,7 +97,7 @@ export const BookReveal: React.FC = () => {
       <BookMockup
         pose={pose}
         coverSrc={assets.ebook.coverFront.src}
-        pageContent={<PrintedComparisonPage />}
+        pageContent={<BookPage id="preface" />}
         sheen={interpolate(frame, [30, 86], [-0.4, 1.4], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
         floorShadow={enter * 0.9}
         style={{opacity: Math.min(1, enter * 2.2)}}

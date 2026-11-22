@@ -1,6 +1,6 @@
 import React from 'react';
 import {Img} from 'remotion';
-import {comparisonPage, cropAspect, Rect} from '../data/mutashabihatPage';
+import {comparisonPage, Rect, tableAspect, TableSpec} from '../data/mutashabihatPage';
 import {alpha, colors} from '../styles/brand';
 
 export type RowHighlight = {
@@ -11,6 +11,8 @@ export type RowHighlight = {
 
 type Props = {
   width: number;
+  /** Which supplied table to show (defaults to the first comparison page). */
+  table?: TableSpec;
   /** Row currently in focus (others are softly dimmed by an overlay). */
   focusRow?: number | null;
   /** 0→1 strength of the focus dimming. */
@@ -29,10 +31,10 @@ const pad = (r: Rect, px: number, py = px): Rect => ({x: r.x - px, y: r.y - py, 
  * image using the page's own pixel coordinates — the image itself is never
  * edited, recoloured or re-typeset.
  */
-export const ComparisonPage: React.FC<Props> = ({width, focusRow = null, focus = 0, highlights = [], feather = 0, style}) => {
-  const {crop, natural, rows, src} = comparisonPage;
+export const ComparisonPage: React.FC<Props> = ({width, table = comparisonPage, focusRow = null, focus = 0, highlights = [], feather = 0, style}) => {
+  const {crop, natural, rows, src} = table;
   const k = width / crop.w;
-  const height = width / cropAspect;
+  const height = width / tableAspect(table);
   const fx = 3.5 * feather;
   const fy = 4 * feather;
   const featherMask = feather > 0.001
@@ -80,20 +82,21 @@ export const ComparisonPage: React.FC<Props> = ({width, focusRow = null, focus =
         {highlights.map(({row, draw}) => {
           if (draw <= 0) return null;
           const data = rows[row];
-          const targets = [pad(data.kalimatCell, -7), ...data.phrases.map((p) => pad(p, 4, 8))];
+          const sx = Math.max(2, 4 * (crop.w / 970)); // paddings scale with the source resolution
+          const targets = [...(data.kalimatCell ? [pad(data.kalimatCell, -7)] : []), ...data.phrases.map((p) => pad(p, sx, 8 * (crop.w / 970) + 1.5))];
           return targets.map((t, j) => {
             const local = Math.min(1, Math.max(0, draw * 1.25 - j * 0.12));
             return (
               <g key={`hl-${row}-${j}`} opacity={Math.min(1, local * 3)}>
                 {/* soft glow */}
-                <rect x={t.x} y={t.y} width={t.w} height={t.h} rx={8} fill="none" stroke={alpha(colors.gold, 0.28 * local)} strokeWidth={9} vectorEffect="non-scaling-stroke" />
+                <rect x={t.x} y={t.y} width={t.w} height={t.h} rx={8 * (crop.w / 970) + 2} fill="none" stroke={alpha(colors.gold, 0.28 * local)} strokeWidth={9} vectorEffect="non-scaling-stroke" />
                 {/* hairline frame that draws on */}
                 <rect
                   x={t.x}
                   y={t.y}
                   width={t.w}
                   height={t.h}
-                  rx={8}
+                  rx={8 * (crop.w / 970) + 2}
                   fill="none"
                   stroke={colors.goldDeep}
                   strokeWidth={2.4}
@@ -111,4 +114,4 @@ export const ComparisonPage: React.FC<Props> = ({width, focusRow = null, focus =
   );
 };
 
-export const comparisonPageHeight = (width: number) => width / cropAspect;
+export const comparisonPageHeight = (width: number, table: TableSpec = comparisonPage) => width / tableAspect(table);

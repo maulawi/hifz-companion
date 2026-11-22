@@ -29,7 +29,7 @@ export const BOOK = {
   board: 5,
   pageInsetX: 9,
   pageInsetY: 7,
-  openAngle: 172,
+  openAngle: 180, // opens flat: both pages lie on the same plane
   perspective: 2400,
 } as const;
 
@@ -68,8 +68,14 @@ const pageEdgesH = `repeating-linear-gradient(0deg, #F4EDDC 0px, #F4EDDC 1.4px, 
 type Props = {
   pose: BookPose;
   coverSrc: string;
-  /** Content printed on the first page (sized PAGE_SURFACE.width × height). */
+  /** Content of the right-hand page (sized PAGE_SURFACE.width × height). */
   pageContent?: React.ReactNode;
+  /** Content of the left-hand page, lying on the open cover. Omit for the endpaper. */
+  leftPageContent?: React.ReactNode;
+  /** Leaves currently turning (right → left). */
+  leaves?: TurningLeaf[];
+  /** 0…1 shadow cast onto the right page by a lifting leaf. */
+  pageShadow?: number;
   /** Specular sweep position across the cover; -1…2, 0.5 = centre. */
   sheen?: number;
   /** Drop-shadow strength 0…1. */
@@ -87,6 +93,9 @@ export const BookMockup: React.FC<Props> = ({
   pose,
   coverSrc,
   pageContent,
+  leftPageContent,
+  leaves = [],
+  pageShadow = 0,
   sheen = -1,
   shadow = 1,
   floorShadow = 0,
@@ -163,6 +172,9 @@ export const BookMockup: React.FC<Props> = ({
             style={{background: colors.paper, overflow: 'hidden'}}
           >
             {pageContent}
+            {pageShadow > 0.001 ? (
+              <div style={{position: 'absolute', inset: 0, background: `linear-gradient(90deg, rgba(37,43,40,${0.34 * pageShadow}) 0%, rgba(37,43,40,${0.12 * pageShadow}) 45%, rgba(37,43,40,0) 85%)`}} />
+            ) : null}
             {/* Gutter shadow */}
             <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(37,43,40,0.22) 0px, rgba(37,43,40,0.06) 26px, rgba(37,43,40,0) 60px)', pointerEvents: 'none'}} />
           </Face>
@@ -206,13 +218,91 @@ export const BookMockup: React.FC<Props> = ({
                 <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(270deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 40px)'}} />
               </div>
             </Face>
+            {/* Left page, lying on the inside of the open cover */}
+            {leftPageContent && pose.open > 0.5 ? (
+              <Face
+                w={Wp}
+                h={Hp}
+                transform={`translate3d(${Wp / 2}px, 0, ${-b / 2 - 1}px) rotateY(180deg)`}
+                style={{background: colors.paper, overflow: 'hidden', backfaceVisibility: 'hidden'}}
+              >
+                {leftPageContent}
+                <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(270deg, rgba(37,43,40,0.24) 0px, rgba(37,43,40,0.07) 26px, rgba(37,43,40,0) 60px)'}} />
+              </Face>
+            ) : null}
             {/* Board edges */}
             <Face w={b} h={H} transform={`translate3d(${W}px, 0, 0) rotateY(90deg)`} style={{background: 'linear-gradient(90deg, #B89A62, #D9C08D)'}} />
             <Face w={W} h={b} transform={`translate3d(${W / 2}px, ${-H / 2}px, 0) rotateX(90deg)`} style={{background: '#D9C08D'}} />
             <Face w={W} h={b} transform={`translate3d(${W / 2}px, ${H / 2}px, 0) rotateX(-90deg)`} style={{background: '#A88C58'}} />
           </div>
+          {leaves.map((leaf, i) => (
+            <Leaf key={i} {...leaf} z={D / 2 + 1.6 + i * 0.8} />
+          ))}
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
+};
+
+export type TurningLeaf = {
+  /** Recto (visible before the turn). */
+  front: React.ReactNode;
+  /** Verso (visible after the turn). */
+  back: React.ReactNode;
+  /** 0 → lying on the right, 1 → lying on the left. Pass an eased value. */
+  turn: number;
+};
+
+const LEAF_SEGMENTS = 3;
+
+/**
+ * A page that turns around the spine. Built from three hinged strips so the
+ * free edge leads and the paper bends through the turn, then flattens.
+ */
+const Leaf: React.FC<TurningLeaf & {z: number}> = ({front, back, turn, z}) => {
+  const W = BOOK.width;
+  const Wp = PAGE_SURFACE.width;
+  const Hp = PAGE_SURFACE.height;
+  const n = LEAF_SEGMENTS;
+  const w = Wp / n;
+  const full = BOOK.openAngle;
+  const theta = full * turn;
+  const bend = Math.sin(Math.PI * turn);
+  // Absolute angle of each strip: inner strip lags, outer strip leads.
+  const abs = [theta * (1 - 0.32 * bend), theta, Math.min(full, theta * (1 + 0.3 * bend) + 6 * bend)];
+  const rel = abs.map((a, i) => (i === 0 ? a : a - abs[i - 1]));
+  const rad = (d: number) => (d * Math.PI) / 180;
+
+  const strip = (i: number): React.ReactNode => {
+    const lightFront = 0.26 * Math.sin(rad(abs[i])) + 0.04 * bend;
+    const lightBack = 0.2 * Math.sin(rad(abs[i]));
+    return (
+      <div style={{position: 'absolute', transformStyle: 'preserve-3d', transform: `translate3d(${i === 0 ? -W / 2 : w}px, 0, ${i === 0 ? z : 0}px) rotateY(${-rel[i]}deg)`}}>
+        {/* front (recto slice i) */}
+        <div style={{position: 'absolute', left: 0, top: -Hp / 2, width: w + 0.8, height: Hp, overflow: 'hidden', backfaceVisibility: 'hidden', background: colors.paper}}>
+          <div style={{position: 'absolute', left: -i * w, top: 0, width: Wp, height: Hp}}>{front}</div>
+          <div style={{position: 'absolute', inset: 0, background: `rgba(37,43,40,${lightFront})`}} />
+        </div>
+        {/* back (verso slice n-1-i), mirrored into place */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: -Hp / 2,
+            width: w + 0.8,
+            height: Hp,
+            overflow: 'hidden',
+            backfaceVisibility: 'hidden',
+            background: colors.paper,
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <div style={{position: 'absolute', left: -(n - 1 - i) * w, top: 0, width: Wp, height: Hp}}>{back}</div>
+          <div style={{position: 'absolute', inset: 0, background: `rgba(37,43,40,${lightBack})`}} />
+        </div>
+        {i < n - 1 ? strip(i + 1) : null}
+      </div>
+    );
+  };
+  return <>{strip(0)}</>;
 };

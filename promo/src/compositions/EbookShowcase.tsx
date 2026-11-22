@@ -1,14 +1,15 @@
 import React from 'react';
 import {AbsoluteFill, Audio, interpolate, Sequence, staticFile} from 'remotion';
 import {linearTiming, TransitionSeries} from '@remotion/transitions';
-import {fade} from '@remotion/transitions/fade';
+import {crossFade} from '../lib/crossFade';
 import {BrandBackground} from '../components/BrandBackground';
 import {BrandIntro} from '../scenes/BrandIntro';
 import {BookReveal} from '../scenes/BookReveal';
-import {EbookPageReveal} from '../scenes/EbookPageReveal';
+import {InsideTheBook} from '../scenes/InsideTheBook';
+import {CollectionMontage} from '../scenes/CollectionMontage';
 import {ClosingReveal} from '../scenes/ClosingReveal';
 import {ease} from '../styles/brand';
-import {AUDIO_CUES, AudioCueId, EBOOK_SHOWCASE_DURATION, INTRO_TRANSITION, SCENES} from './ebookShowcase.timeline';
+import {AUDIO_CUES, AudioCueId, EBOOK_SHOWCASE_DURATION, SCENES, TRANSITIONS} from './ebookShowcase.timeline';
 
 export type EbookShowcaseProps = {
   /** Optional licensed/original ambient bed, path relative to /public (e.g. "audio/batch01-bed.wav"). */
@@ -27,7 +28,7 @@ export const ebookShowcaseDefaults: EbookShowcaseProps = {
 };
 
 /**
- * Batch 01 — Mutashabihat Ebook showcase (1080×1920, 30 fps, 12 s).
+ * Batch 01 — Mutashabihat Ebook showcase (1080×1920, 30 fps, ~26.9 s).
  * Visually complete without audio; audio layers render only when provided.
  */
 export const EbookShowcase: React.FC<EbookShowcaseProps> = ({musicSrc, musicVolume = 0.55, sfx = {}, sfxVolume = 0.35}) => {
@@ -35,18 +36,22 @@ export const EbookShowcase: React.FC<EbookShowcaseProps> = ({musicSrc, musicVolu
     <AbsoluteFill>
       <BrandBackground />
       <TransitionSeries>
-        <TransitionSeries.Sequence durationInFrames={SCENES.brandIntro} name="01 Brand intro">
+        <TransitionSeries.Sequence durationInFrames={SCENES.origin} name="A Brand & scholarly origin">
           <BrandIntro />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade()} timing={linearTiming({durationInFrames: INTRO_TRANSITION, easing: ease.inOut})} />
-        <TransitionSeries.Sequence durationInFrames={SCENES.bookReveal} name="02 Book reveal">
+        <TransitionSeries.Transition presentation={crossFade()} timing={linearTiming({durationInFrames: TRANSITIONS.originToReveal, easing: ease.inOut})} />
+        <TransitionSeries.Sequence durationInFrames={SCENES.bookReveal} name="B Book reveal">
           <BookReveal />
         </TransitionSeries.Sequence>
-        {/* 02→03→04 share one continuous book pose, so these are seamless cuts */}
-        <TransitionSeries.Sequence durationInFrames={SCENES.pageReveal} name="03 Inside the ebook">
-          <EbookPageReveal />
+        {/* B→C→D share one continuous book pose, so these are seamless cuts */}
+        <TransitionSeries.Sequence durationInFrames={SCENES.pages} name="C Pages come alive">
+          <InsideTheBook />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Sequence durationInFrames={SCENES.closing} name="04 Closing">
+        <TransitionSeries.Sequence durationInFrames={SCENES.montage} name="D Collection montage">
+          <CollectionMontage />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition presentation={crossFade()} timing={linearTiming({durationInFrames: TRANSITIONS.montageToClosing, easing: ease.inOut})} />
+        <TransitionSeries.Sequence durationInFrames={SCENES.closing} name="E Closing">
           <ClosingReveal />
         </TransitionSeries.Sequence>
       </TransitionSeries>
