@@ -28,8 +28,15 @@ export const fonts = {
   sans: '"Inter", "Helvetica Neue", Arial, sans-serif',
 } as const;
 
-/** Vertical 9:16 canvas used by all batches. */
-export const canvas = {width: 1080, height: 1920, fps: 30} as const;
+/** Output formats. Each batch picks one; scenes read the size via useLayout(). */
+export const formats = {
+  vertical: {width: 1080, height: 1920, fps: 30},
+  landscape: {width: 1920, height: 1080, fps: 30},
+} as const;
+export type FormatId = keyof typeof formats;
+
+/** Default (vertical 9:16) canvas — Batch 01. */
+export const canvas = formats.vertical;
 
 /**
  * Mobile-safe content box. Keeps type and key objects clear of the

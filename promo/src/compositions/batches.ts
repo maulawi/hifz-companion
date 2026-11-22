@@ -1,4 +1,7 @@
 import React from 'react';
+import {FormatId} from '../styles/brand';
+import {MutasyabihatChallenge} from './MutasyabihatChallenge';
+import {CHALLENGE_DURATION} from './challenge.timeline';
 import {EbookShowcase, ebookShowcaseDefaults} from './EbookShowcase';
 import {EBOOK_SHOWCASE_DURATION} from './ebookShowcase.timeline';
 
@@ -14,6 +17,8 @@ export type Batch = {
   title: string;
   component: React.FC<any>;
   durationInFrames: number;
+  /** Output format; defaults to vertical 1080×1920. */
+  format?: FormatId;
   defaultProps?: Record<string, unknown>;
 };
 
@@ -25,7 +30,13 @@ export const BATCHES: Batch[] = [
     durationInFrames: EBOOK_SHOWCASE_DURATION,
     defaultProps: ebookShowcaseDefaults,
   },
-  // { id: 'Batch02-MutashabihatChallenge', ... },
+  {
+    id: 'Batch02-MutasyabihatChallenge',
+    title: 'Mutasyabihat Challenge',
+    component: MutasyabihatChallenge,
+    durationInFrames: CHALLENGE_DURATION,
+    format: 'landscape',
+  },
   // { id: 'Batch03-HifzCompanion', ... },
   // { id: 'Batch04-HifzTimeline', ... },
 ];
