@@ -13,7 +13,7 @@ export const PAGE_FLOW: PageFlowConfig = {
   spreads: [
     {left: null, right: 'preface'}, // endpaper | Preface & Arabic naẓm
     {left: 'contents', right: 'introduction'}, // Table of Contents | Introduction
-    {left: 'comparisonsB', right: 'comparisonsA'}, // comparison tables
+    {left: 'page51', right: 'page52'}, // two full Mutashabihat pages (nazm, meaning, comparison tables)
   ],
   start: 42, // cover fully open
   holds: [66, 84, 52],
@@ -24,7 +24,7 @@ export const PAGE_FLOW: PageFlowConfig = {
 export const SPREAD_LABELS: Array<{left?: string; right?: string; center?: string}> = [
   {right: 'Preface  ·  The Nazm'},
   {left: 'Contents', right: 'Introduction'},
-  {center: 'The Comparisons'},
+  {center: 'Mutashabihat Verses'},
 ];
 
 // ───────────────────────── Scene durations ─────────────────────────

@@ -36,6 +36,20 @@ export const EBOOK_PAGES = {
     src: staticFile('ebook/pages/introduction.webp'),
     natural: {width: 520, height: 747},
   },
+  page51: {
+    kind: 'image',
+    id: 'page51',
+    title: 'Mutashabihat · p. 51',
+    src: staticFile('ebook/pages/mutashabihat-p51.webp'),
+    natural: {width: 530, height: 751},
+  },
+  page52: {
+    kind: 'image',
+    id: 'page52',
+    title: 'Mutashabihat · p. 52',
+    src: staticFile('ebook/pages/mutashabihat-p52.webp'),
+    natural: {width: 527, height: 747},
+  },
   comparisonsA: {kind: 'tables', id: 'comparisonsA', title: 'Comparisons', tables: [comparisonPage]},
   comparisonsB: {kind: 'tables', id: 'comparisonsB', title: 'Comparisons', tables: [comparisonTable02, comparisonTable03]},
 } satisfies Record<string, EbookPage>;

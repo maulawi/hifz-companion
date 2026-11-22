@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Img, useCurrentFrame} from 'remotion';
-import {BookMockup, lerpPose} from '../components/BookMockup';
+import {BookMockup, lerpPose, PAGE_SURFACE} from '../components/BookMockup';
 import {BookPage, tablePlacement} from '../components/BookPage';
 import {ComparisonPage, RowHighlight} from '../components/ComparisonPage';
 import {GoldDivider} from '../components/GoldDivider';
@@ -16,12 +16,11 @@ import {pagePointOnScreen, POSES} from '../compositions/ebookShowcase.timeline';
 /** Card state: centre (x, y), rest width, depth 0 (front) … 1 (far back), zoom around (fx, fy), tilt. */
 type CardState = {x: number; y: number; w: number; d: number; zoom: number; fx: number; fy: number; rot: number};
 
-/** Where a table sits on screen while it is still printed on the open spread. */
-const onPage = (pageId: 'comparisonsA' | 'comparisonsB', side: 'left' | 'right', index: number): CardState => {
-  const p = tablePlacement(pageId)[index];
+/** Where a card emerges from the open spread (full pages 51 | 52): a point on the page, small and fading in. */
+const fromPage = (side: 'left' | 'right', fy: number): CardState => {
   const pose = POSES.spreadFacing;
-  const c = pagePointOnScreen(pose, side, p.x + p.width / 2, p.y + p.height / 2);
-  return {x: c.x, y: c.y, w: p.width * pose.scale, d: 0, zoom: 1, fx: 0.5, fy: 0.5, rot: 0};
+  const c = pagePointOnScreen(pose, side, PAGE_SURFACE.width / 2, PAGE_SURFACE.height * fy);
+  return {x: c.x, y: c.y, w: PAGE_SURFACE.width * pose.scale * 0.72, d: 0, zoom: 1, fx: 0.5, fy: 0.5, rot: 0};
 };
 
 const HERO_A = {x: 540, y: 740, w: 960};
@@ -56,7 +55,7 @@ const T = MONTAGE_T;
 const ZOOM_FOCUS = {fx: 0.5, fy: 0.61};
 
 const CARD_A: Keyframe<CardState>[] = [
-  {f: T.liftA, ...onPage('comparisonsA', 'right', 0)},
+  {f: T.liftA, ...fromPage('right', 0.72)},
   {f: T.liftA + T.liftDuration, ...base, ...HERO_A},
   {f: T.zoomIn, ...base, ...HERO_A, ...ZOOM_FOCUS},
   {f: T.zoomIn + 20, ...base, ...HERO_A, ...ZOOM_FOCUS, zoom: 1.22},
@@ -65,7 +64,7 @@ const CARD_A: Keyframe<CardState>[] = [
   {f: T.swapB + 28, ...base, ...BACK_L, ...ZOOM_FOCUS},
 ];
 const CARD_B: Keyframe<CardState>[] = [
-  {f: T.liftB, ...onPage('comparisonsB', 'left', 0)},
+  {f: T.liftB, ...fromPage('left', 0.3)},
   {f: T.liftB + T.liftDuration, ...base, ...WAIT_L},
   {f: T.swapB, ...base, ...WAIT_L},
   {f: T.swapB + 28, ...base, ...HERO_SMALL},
@@ -73,7 +72,7 @@ const CARD_B: Keyframe<CardState>[] = [
   {f: T.swapC + 26, ...base, ...BACK_R},
 ];
 const CARD_C: Keyframe<CardState>[] = [
-  {f: T.liftC, ...onPage('comparisonsB', 'left', 1)},
+  {f: T.liftC, ...fromPage('left', 0.72)},
   {f: T.liftC + T.liftDuration, ...base, ...WAIT_R},
   {f: T.swapC, ...base, ...WAIT_R},
   {f: T.swapC + 26, ...base, ...HERO_SMALL, y: 800},
@@ -82,7 +81,7 @@ const CARD_C: Keyframe<CardState>[] = [
 type CardProps = {
   table: TableSpec;
   state: CardState;
-  /** 0 = still printed on the page, 1 = fully lifted. */
+  /** 0 = just emerging from the page, 1 = fully lifted. */
   lift: number;
   highlights: RowHighlight[];
   focusRow?: number | null;
@@ -108,7 +107,7 @@ const MontageCard: React.FC<CardProps> = ({table, state, lift, highlights, focus
         height: H,
         borderRadius: 10 * lift,
         overflow: 'hidden',
-        opacity: 1 - d * 0.38,
+        opacity: (1 - d * 0.38) * Math.min(1, lift * 2.5),
         filter: d > 0.03 ? `blur(${d * 2.4}px)` : undefined,
         transform: Math.abs(rot) > 0.01 ? `perspective(1600px) rotateY(${rot}deg)` : undefined,
         boxShadow: shadowK > 0.001 ? shadows.card.replace(/rgba\(16,44,35,([\d.]+)\)/g, (_, a) => `rgba(16,44,35,${(parseFloat(a) * shadowK).toFixed(3)})`) : 'none',
@@ -157,7 +156,7 @@ const DeepPages: React.FC<{presence: number; frame: number}> = ({presence, frame
 const rowDraws = (frame: number, start: number, rows: number, gap: number): RowHighlight[] =>
   Array.from({length: rows}, (_, row) => ({row, draw: progress(frame, start + row * gap, 12, ease.out)}));
 
-/** Scene D — the tables lift off the spread and a layered montage shows the scale of the work. */
+/** Scene D — tables rise out of the open spread and a layered montage shows the scale of the work. */
 export const CollectionMontage: React.FC = () => {
   const frame = useCurrentFrame();
   const fadeBook = progress(frame, 4, 40, ease.soft);
@@ -188,8 +187,8 @@ export const CollectionMontage: React.FC = () => {
       <BookMockup
         pose={bookPose}
         coverSrc={assets.ebook.coverFront.src}
-        pageContent={<BookPage id="comparisonsA" hidden={[0]} />}
-        leftPageContent={<BookPage id="comparisonsB" hidden={[...(frame >= T.liftB ? [0] : []), ...(frame >= T.liftC ? [1] : [])]} />}
+        pageContent={<BookPage id="page52" />}
+        leftPageContent={<BookPage id="page51" />}
         shadow={1 - fadeBook}
         blur={fadeBook * 8}
         veil={fadeBook}
