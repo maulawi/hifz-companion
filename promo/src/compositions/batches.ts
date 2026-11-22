@@ -35,7 +35,8 @@ export const BATCHES: Batch[] = [
     title: 'Mutasyabihat Challenge',
     component: MutasyabihatChallenge,
     durationInFrames: CHALLENGE_DURATION,
-    format: 'landscape',
+    // Vertical master to match the rest of the series (a landscape cut can be added later).
+    format: 'vertical',
   },
   // { id: 'Batch03-HifzCompanion', ... },
   // { id: 'Batch04-HifzTimeline', ... },

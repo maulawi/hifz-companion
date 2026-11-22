@@ -34,10 +34,10 @@ export const Intro: React.FC = () => {
 
   // ── Layout (landscape master; vertical stacks the same elements) ──
   const textX = L.landscape ? 210 : L.safe.x;
-  const iconTo = L.landscape ? {x: 1290, y: 600} : {x: L.cx, y: 640};
-  const panelAt = L.landscape ? {x: 1500, y: 545} : {x: L.cx + 170, y: 700};
+  const iconTo = L.landscape ? {x: 1290, y: 600} : {x: L.cx - 110, y: 820};
+  const panelAt = L.landscape ? {x: 1500, y: 545} : {x: L.cx + 150, y: 760};
   const logoBig = {w: 400, x: L.cx, y: L.cy - 20};
-  const logoSmall = L.landscape ? {w: 128, x: textX + 64, y: 262} : {w: 170, x: L.cx, y: 260};
+  const logoSmall = L.landscape ? {w: 128, x: textX + 64, y: 262} : {w: 150, x: L.cx, y: 250};
 
   // ── QURRA logo: resolve centre-stage, then settle into the lock-up ──
   const logoIn = settle(frame, fps, T.logo, 30);
@@ -81,12 +81,12 @@ export const Intro: React.FC = () => {
           width={L.landscape ? 760 : 700}
           draw={progress(frame, T.arch, 70, ease.soft)}
           opacity={0.2}
-          style={{position: 'absolute', left: L.landscape ? 1110 : L.cx - 350, top: L.landscape ? 640 : 1350}}
+          style={{position: 'absolute', left: L.landscape ? 1110 : L.cx - 350, top: L.landscape ? 640 : 860}}
         />
 
         <ScreenPanel
           screen={CHALLENGE_SCREENS.home}
-          width={L.landscape ? 430 : 400}
+          width={L.landscape ? 430 : 380}
           x={panelAt.x + (1 - panelIn) * 140}
           y={panelAt.y + iconFloat * -0.4}
           rotateY={-24 + panelIn * 6}
@@ -125,7 +125,7 @@ export const Intro: React.FC = () => {
           start={T.headline}
           align={L.landscape ? 'left' : 'center'}
           x={L.landscape ? textX : L.cx}
-          y={L.landscape ? 400 : 1000}
+          y={L.landscape ? 400 : 1220}
           width={L.landscape ? 820 : 900}
           headlineSize={L.landscape ? 112 : 96}
           supportSize={40}

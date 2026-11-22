@@ -6,7 +6,7 @@ share one design system.
 | Batch | Composition id | Status |
 |---|---|---|
 | 01 · Mutashabihat Ebook | `Batch01-EbookShowcase` (26.9 s / 806 f) | Review (v2) |
-| 02 · Mutashabihat Challenge | — | not started |
+| 02 · Mutasyabihat Challenge | `Batch02-MutasyabihatChallenge` (30.0 s / 900 f) | Review |
 | 03 · Hifz Companion | — | not started |
 | 04 · Hifz Timeline | — | not started |
 
@@ -127,6 +127,16 @@ Cue markers (absolute frames @ 30 fps) are defined in `AUDIO_CUES`
 (`src/compositions/ebookShowcase.timeline.ts`): music in/out, logo shimmer,
 origin title, book rise, cover open, two page turns, card lift, highlight ticks
 and the closing shimmer.
+
+## Batch 02 — Mutasyabihat Challenge
+
+Vertical 1080×1920 master, 30 s. Scenes live in `src/scenes/challenge/`
+(Intro, HomeStart, Question, AyahComparison, Progress, Outro); durations,
+order and cross-fades in `src/compositions/challenge.timeline.ts`; screenshot
+regions in `src/data/challenge.ts`. Every interface element is a crop of a
+supplied screenshot (`ScreenPanel`); highlights, the selection ring, value
+wipes and the progress-bar reveal are overlays or masks over those pixels.
+Asset notes: `docs/batch02-asset-manifest.md`.
 
 ## Adding the next batch
 
