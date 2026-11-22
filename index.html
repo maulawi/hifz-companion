@@ -3,249 +3,428 @@
 <head>
 <meta charset="UTF-8" />
 <title>Hifz Companion — QURRA Hifz Lab</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%93%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F9F5EA" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9A85E' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.6c-1.9-1.4-4.4-2.1-7.6-2.1v13.1c3.2 0 5.7.7 7.6 2.1 1.9-1.4 4.4-2.1 7.6-2.1V4.5c-3.2 0-5.7.7-7.6 2.1z'/%3E%3Cpath d='M12 6.6v13.1'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ==========================================================
+   Hifz Companion — Cream-first design system
+   70% cream · 20% olive · 10% gold + sand
+   ========================================================== */
 :root{
-  --deep-green:#0B3026;
-  --forest:#123D31;
-  --cream:#F4EBD8;
-  --ivory:#FAF6EC;
-  --gold:#B89A5A;
-  --soft-gold:#D7C28A;
-  --charcoal:#1F211D;
-  --olive:#66685F;
-  --border-beige:#CDBD98;
-  --success:#2E6B4F;
-  --success-bg:#E7EFE8;
-  --error:#9B4D4D;
-  --error-bg:#F3E7E7;
-  --amber:#A9752C;
-  --amber-bg:#F1E4CC;
-  --font-serif:'Cormorant Garamond', serif;
-  --font-sans:'Inter', sans-serif;
+  /* Core palette */
+  --cream:#F9F5EA;        /* main background */
+  --green:#254E3D;        /* primary actions, active states */
+  --gold:#C9A85E;         /* icons, highlights, hairlines */
+  --sand:#E8D9C3;         /* secondary surfaces */
+  --ink:#252B28;          /* main text */
+
+  /* Derived tones */
+  --surface:#FDFBF5;      /* cards: a lighter cream lifted off the page */
+  --cream-deep:#F3ECDC;   /* subtle fills, hover */
+  --green-hover:#1E4133;
+  --green-tint:#E6ECE5;
+  --gold-tint:#F3E8CC;
+  --sand-soft:#F1E8D9;
+  --muted:#6F726B;
+  --faint:#9A9A90;
+  --line:rgba(201,168,94,0.30);
+  --line-strong:rgba(201,168,94,0.55);
+  --attn:#A86A3D;         /* "Perlu Perhatian" — muted terracotta */
+  --attn-tint:#F4E5D8;
+  --weak:#9B4D4D;  --weak-tint:#F4E6E3;
+  --mid:#9A7430;   --mid-tint:#F4EAD3;
+  --good:#2F6A4F;  --good-tint:#E5EEE6;
+
+  /* Type */
+  --font-serif:'Playfair Display', Georgia, serif;
+  --font-sans:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-arabic:'Amiri', 'Noto Naskh Arabic', serif;
+
+  /* Shape + depth */
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-pill:999px;
+  --shadow-sm:0 1px 2px rgba(60,48,20,0.05);
+  --shadow:0 1px 2px rgba(60,48,20,0.04), 0 6px 20px -8px rgba(60,48,20,0.12);
+  --shadow-lg:0 20px 50px -20px rgba(37,43,40,0.35);
+
+  --tabbar-h:68px;
+  --sidebar-w:232px;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
-  background:var(--ivory);
-  color:var(--charcoal);
+  background:var(--cream);
+  color:var(--ink);
   font-family:var(--font-sans);
+  font-size:15px;
+  line-height:1.5;
   -webkit-font-smoothing:antialiased;
+  font-variant-numeric:lining-nums;
   min-height:100vh;
+  overflow-x:hidden;
 }
 a{color:inherit;}
-#app{max-width:900px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
-h1,h2,h3{font-family:var(--font-serif);color:var(--deep-green);margin:0 0 8px;font-weight:600;}
-p{line-height:1.6;color:var(--charcoal);margin:0 0 10px;}
-.muted{color:var(--olive);font-size:13.5px;}
-.eyebrow{font-family:var(--font-sans);font-size:12px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+[dir="rtl"], .arabic{font-family:var(--font-arabic);}
+h1,h2,h3{font-family:var(--font-serif);color:var(--ink);margin:0 0 8px;font-weight:500;letter-spacing:-0.005em;}
+h2{font-size:26px;line-height:1.2;}
+h3{font-size:18px;}
+p{line-height:1.6;color:var(--ink);margin:0 0 10px;}
+strong{font-weight:600;}
+.muted{color:var(--muted);font-size:13.5px;}
+.unit{font-family:var(--font-sans);font-size:14px;color:var(--muted);font-weight:400;}
+.icon{width:22px;height:22px;flex:0 0 auto;display:inline-block;vertical-align:middle;}
+.icon-sm{width:16px;height:16px;}
+.icon-lg{width:30px;height:30px;}
+.gold{color:var(--gold);}
 
-/* ---------- Nav ---------- */
-.nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;background:var(--deep-green);color:var(--ivory);
-  flex-wrap:wrap;gap:10px;
+/* ---------- App shell ---------- */
+#app{min-height:100vh;}
+.shell{min-height:100vh;display:flex;}
+.content{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;}
+main{flex:1;width:100%;max-width:560px;margin:0 auto;padding:4px 16px 24px;}
+.shell.no-nav main{padding-bottom:40px;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+  max-width:560px;width:100%;margin:0 auto;
 }
-.brand{display:flex;align-items:center;gap:9px;font-family:var(--font-serif);font-size:20px;letter-spacing:0.02em;}
-.brand .mark{
-  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--soft-gold);
-  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--soft-gold);flex:0 0 auto;
-}
-.nav-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.navlinks{display:flex;gap:16px;font-size:13.5px;flex-wrap:wrap;}
-.navlinks button{
-  background:none;border:none;color:var(--ivory);opacity:0.72;cursor:pointer;
-  font-family:var(--font-sans);font-size:13.5px;padding:4px 0;
-}
-.navlinks button.active{opacity:1;border-bottom:1.5px solid var(--soft-gold);}
-.lang-toggle{display:flex;gap:2px;border:1px solid rgba(250,246,236,0.35);border-radius:6px;padding:2px;flex-shrink:0;}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--font-serif);font-size:19px;color:var(--ink);font-weight:500;}
+.brand .icon{color:var(--gold);width:26px;height:26px;}
+
+.lang-toggle{display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-pill);padding:3px;flex-shrink:0;}
 .lang-toggle button{
-  background:none;border:none;color:var(--ivory);opacity:0.7;cursor:pointer;
-  font-family:var(--font-sans);font-size:12px;font-weight:600;letter-spacing:0.03em;
-  padding:4px 9px;border-radius:4px;
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-family:var(--font-sans);font-size:11.5px;font-weight:500;letter-spacing:0.04em;
+  padding:5px 11px;border-radius:var(--r-pill);min-height:28px;
 }
-.lang-toggle button.active{opacity:1;background:var(--soft-gold);color:var(--charcoal);}
+.lang-toggle button.active{background:var(--green);color:var(--cream);}
 
-main{flex:1;padding:22px 18px 60px;}
-@media (min-width:600px){ main{padding:28px 24px 60px;} }
+/* ---------- Navigation: bottom tab bar (mobile) / sidebar (desktop) ---------- */
+.appnav{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:rgba(249,245,234,0.94);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+}
+.appnav .nav-brand, .appnav .nav-foot{display:none;}
+.nav-items{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:560px;margin:0 auto;}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  font-family:var(--font-sans);font-size:11px;font-weight:500;
+  padding:7px 4px;border-radius:var(--r-md);min-height:52px;
+  transition:background .15s ease,color .15s ease;
+}
+.nav-item .icon{width:22px;height:22px;}
+.nav-item:hover{color:var(--ink);}
+.nav-item.active{background:var(--green);color:var(--cream);box-shadow:0 4px 12px -4px rgba(37,78,61,0.45);}
+
+@media (min-width:960px){
+  .appnav{
+    position:sticky;top:0;bottom:auto;left:auto;right:auto;height:100vh;
+    width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+    border-top:none;border-right:1px solid var(--line);
+    background:var(--cream);backdrop-filter:none;
+    display:flex;flex-direction:column;padding:28px 16px;
+  }
+  .appnav .nav-brand{display:flex;padding:0 10px 28px;}
+  .appnav .nav-foot{display:block;margin-top:auto;padding:0 10px;font-size:11.5px;color:var(--faint);line-height:1.5;}
+  .nav-items{display:flex;flex-direction:column;gap:4px;max-width:none;margin:0;}
+  .nav-item{flex-direction:row;justify-content:flex-start;gap:12px;font-size:14px;padding:11px 14px;min-height:44px;}
+  .nav-item.active{box-shadow:none;}
+  .nav-item:not(.active):hover{background:var(--cream-deep);}
+  .shell:not(.no-nav) .topbar .brand{visibility:hidden;}
+  .topbar{max-width:920px;padding:22px 32px 6px;}
+  main{max-width:920px;padding:4px 32px 56px;}
+  .shell.no-nav main, .shell.no-nav .topbar{max-width:640px;}
+}
+
+footer.page-footer{padding:4px 20px 20px;text-align:center;font-size:11.5px;color:var(--faint);}
+.shell:not(.no-nav) footer.page-footer{padding-bottom:calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));}
+@media (min-width:960px){ .shell:not(.no-nav) footer.page-footer{display:none;} }
+
+/* ---------- Page header (Rancang / Peta / Riwayat) ---------- */
+.page-head{text-align:center;padding:10px 8px 22px;}
+.page-head .head-icon{color:var(--gold);margin-bottom:8px;}
+.page-head .head-icon .icon{width:36px;height:36px;}
+.page-head h2{font-size:30px;margin-bottom:6px;}
+.page-head p{color:var(--muted);font-size:14px;margin:0;}
+@media (min-width:960px){ .page-head{text-align:left;display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:center;padding:12px 0 26px;}
+  .page-head .head-icon{grid-row:span 2;margin:0;width:60px;height:60px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+  .page-head .head-icon .icon{width:30px;height:30px;}
+  .page-head h2{margin:0;} }
+
+.section-title{display:flex;align-items:center;gap:10px;font-family:var(--font-serif);font-size:19px;font-weight:500;color:var(--ink);margin:0 0 12px;}
+.section-title .icon{color:var(--gold);}
 
 /* ---------- Buttons ---------- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  font-family:var(--font-sans);font-size:14.5px;font-weight:600;
-  padding:12px 22px;border-radius:6px;cursor:pointer;border:1px solid transparent;
-  transition:opacity .15s ease;
+  font-family:var(--font-sans);font-size:14.5px;font-weight:500;
+  padding:12px 22px;min-height:46px;border-radius:var(--r-pill);cursor:pointer;border:1px solid transparent;
+  transition:background .15s ease,opacity .15s ease,border-color .15s ease;
 }
-.btn-primary{background:var(--deep-green);color:var(--ivory);}
-.btn-primary:hover{opacity:0.92;}
-.btn-secondary{background:transparent;color:var(--deep-green);border-color:var(--border-beige);}
-.btn-secondary:hover{background:var(--cream);}
-.btn-accent{background:var(--gold);color:var(--charcoal);}
+.btn .icon{width:18px;height:18px;}
+.btn-primary{background:var(--green);color:var(--cream);box-shadow:0 4px 14px -6px rgba(37,78,61,0.55);}
+.btn-primary:hover{background:var(--green-hover);}
+.btn-secondary{background:var(--surface);color:var(--green);border-color:var(--line-strong);}
+.btn-secondary:hover{background:var(--cream-deep);}
+.btn-accent{background:var(--green);color:var(--cream);}
 .btn-block{width:100%;}
 .btn:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-plain{background:none;border:none;color:var(--olive);font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0;}
-.btn-sm{padding:8px 14px;font-size:13px;}
+.btn-plain{background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0;}
+.btn-sm{padding:9px 16px;font-size:13.5px;min-height:40px;}
 
 /* ---------- Cards ---------- */
-.card{background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:18px;}
-.due-card{background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:16px 18px;margin-bottom:14px;}
-.due-card .dctitle{font-family:var(--font-serif);font-size:17px;color:var(--deep-green);margin-bottom:4px;}
-.due-card .dcbody{font-size:14px;color:var(--charcoal);margin-bottom:12px;}
-.due-card.empty{opacity:0.7;}
-.due-card.done{background:var(--success-bg);border-color:var(--success);}
-.due-card.done .dctitle{color:var(--success);}
-.dc-check{display:inline-flex;align-items:center;gap:6px;color:var(--success);font-size:13px;font-weight:600;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);}
 
-.all-done-card{
-  background:linear-gradient(160deg, var(--deep-green), var(--forest));
-  color:var(--ivory);border-radius:12px;padding:30px 24px;text-align:center;
+/* ---------- Utama: hero ---------- */
+.hero{position:relative;padding:10px 4px 22px;min-height:128px;}
+.hero .greet{font-size:14px;color:var(--muted);margin-bottom:2px;}
+.hero h2{font-size:32px;margin:0 0 4px;}
+.hero .date{font-size:14px;color:var(--muted);}
+.hero-art{position:absolute;right:-6px;bottom:6px;width:148px;height:auto;color:var(--gold);opacity:0.55;pointer-events:none;}
+.hero > *:not(.hero-art){position:relative;z-index:1;}
+@media (min-width:960px){ .hero{padding:4px 0 26px;} .hero h2{font-size:38px;} .hero-art{width:200px;right:0;} }
+
+/* ---------- Utama: task cards ---------- */
+.utama-grid{display:grid;gap:14px;}
+@media (min-width:720px){
+  .utama-grid{grid-template-columns:1fr 1fr;}
+  .utama-grid .span-2{grid-column:span 2;}
 }
-.all-done-card h2{color:var(--ivory);}
-.all-done-card p{color:rgba(244,235,216,0.86);}
+.task-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+.task-head{display:flex;align-items:flex-start;gap:14px;}
+.task-icon{color:var(--gold);padding-top:2px;}
+.task-icon .icon{width:30px;height:30px;}
+.task-info{flex:1;min-width:0;}
+.task-title{font-family:var(--font-serif);font-size:19px;color:var(--ink);line-height:1.25;margin-bottom:4px;}
+.task-main{font-size:15px;color:var(--ink);}
+.task-sub{font-size:14px;color:var(--muted);}
+.task-hint{font-size:12.5px;color:var(--faint);margin-top:6px;}
+.task-head{margin-bottom:16px;}
+.task-card .btn{margin-top:auto;}
+.task-card.is-done{background:var(--surface);}
+.task-card.is-empty .task-icon{color:var(--faint);}
+.done-pill{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px 6px 8px;border-radius:var(--r-pill);
+  background:var(--green-tint);color:var(--green);font-size:13px;font-weight:500;}
+.done-pill .icon{width:16px;height:16px;}
+.bonus-note{margin-top:12px;padding:10px 12px;border-radius:var(--r-sm);background:var(--attn-tint);color:var(--attn);font-size:12.5px;line-height:1.45;}
 
-/* ---------- Streak strip ---------- */
-.streak-strip{display:flex;gap:12px;margin:16px 0 22px;flex-wrap:wrap;}
-.streak-box{flex:1;min-width:110px;background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:12px 14px;text-align:center;}
-.streak-box .snum{font-family:var(--font-serif);font-size:23px;color:var(--deep-green);}
-.streak-box .slabel{font-size:11.5px;color:var(--olive);margin-top:2px;}
+.ring{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;}
+.ring svg{display:block;}
+.ring .ring-label{position:absolute;font-size:12.5px;font-weight:500;color:var(--ink);}
 
-/* ---------- Needs attention ---------- */
-.attn-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
-.attn-chip{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);border-radius:20px;padding:5px 12px;font-size:12.5px;}
+/* All-done card */
+.all-done-card{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:28px 22px;text-align:center;box-shadow:var(--shadow);}
+.all-done-card .done-mark{width:56px;height:56px;border-radius:50%;margin:0 auto 14px;background:var(--green);color:var(--cream);display:flex;align-items:center;justify-content:center;}
+.all-done-card .done-mark .icon{width:26px;height:26px;}
+.all-done-card h2{font-size:24px;color:var(--green);}
+.all-done-card p{color:var(--muted);margin:0;}
+
+/* Progress card */
+.progress-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);}
+.progress-card .pc-head{display:flex;align-items:center;gap:12px;}
+.progress-card .pc-head .icon{color:var(--gold);width:26px;height:26px;}
+.progress-card .pc-title{font-family:var(--font-serif);font-size:18px;}
+.progress-card .pc-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:8px;}
+.progress-card .pc-juz{font-size:15px;}
+.progress-card .pc-pct{font-family:var(--font-serif);font-size:24px;color:var(--ink);line-height:1;}
+
+.bar-track{height:8px;background:var(--sand);border-radius:var(--r-pill);overflow:hidden;margin:10px 0;}
+.bar-fill{height:100%;border-radius:var(--r-pill);transition:width .3s ease;}
+.bar-fill.gold{background:var(--gold);}
+.bar-fill.green{background:var(--green);}
+
+/* Stat tiles */
+.stat-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.stat-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.stat-tile .icon{color:var(--gold);width:26px;height:26px;}
+.stat-tile .st-label{font-size:12.5px;color:var(--muted);}
+.stat-tile .st-val{font-size:17px;color:var(--ink);font-weight:500;}
 
 /* ---------- Forms ---------- */
-.field{margin-bottom:16px;}
-.field label{display:block;font-size:12.5px;color:var(--olive);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;}
-.field select, .field input[type=number], .field input[type=text]{
-  width:100%;padding:11px 12px;border:1px solid var(--border-beige);border-radius:6px;
-  background:var(--ivory);color:var(--charcoal);font-family:var(--font-sans);font-size:14.5px;
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:0.02em;font-weight:500;}
+.field select, .field input[type=number], .field input[type=text], .field textarea{
+  width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:var(--r-sm);
+  background:var(--surface);color:var(--ink);font-family:var(--font-sans);font-size:15px;min-height:46px;
+  transition:border-color .15s ease, box-shadow .15s ease;
 }
-.field textarea{
-  width:100%;padding:11px 12px;border:1px solid var(--border-beige);border-radius:6px;
-  background:var(--ivory);color:var(--charcoal);font-family:var(--font-sans);font-size:14.5px;min-height:70px;resize:vertical;
-}
+.field textarea{min-height:76px;resize:vertical;}
+.field select:focus, .field input:focus, .field textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(37,78,61,0.12);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .choice-group{display:flex;gap:8px;flex-wrap:wrap;}
 .choice{
-  padding:10px 16px;border:1px solid var(--border-beige);border-radius:20px;cursor:pointer;
-  font-size:13.5px;background:var(--ivory);color:var(--charcoal);
+  padding:9px 16px;min-height:40px;display:inline-flex;align-items:center;gap:6px;
+  border:1px solid var(--line-strong);border-radius:var(--r-pill);cursor:pointer;
+  font-size:13.5px;background:var(--surface);color:var(--ink);transition:background .15s ease,border-color .15s ease;
+  user-select:none;
 }
-.choice.selected{background:var(--deep-green);color:var(--ivory);border-color:var(--deep-green);}
+.choice:hover{background:var(--cream-deep);}
+.choice.selected{background:var(--green);color:var(--cream);border-color:var(--green);}
+.choice.selected .muted{color:rgba(249,245,234,0.75);}
 .rating-group{display:flex;gap:8px;}
-.rating-choice{flex:1;text-align:center;padding:12px 6px;border:1px solid var(--border-beige);border-radius:8px;cursor:pointer;font-size:13.5px;background:var(--ivory);}
-.rating-choice.selected.lemah{background:var(--error-bg);border-color:var(--error);color:var(--error);font-weight:600;}
-.rating-choice.selected.sederhana{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);font-weight:600;}
-.rating-choice.selected.lancar{background:var(--success-bg);border-color:var(--success);color:var(--success);font-weight:600;}
+.rating-choice{flex:1;text-align:center;padding:12px 6px;min-height:46px;border:1px solid var(--line-strong);border-radius:var(--r-sm);cursor:pointer;font-size:13.5px;background:var(--surface);user-select:none;}
+.rating-choice.selected.lemah{background:var(--weak-tint);border-color:var(--weak);color:var(--weak);font-weight:500;}
+.rating-choice.selected.sederhana{background:var(--mid-tint);border-color:var(--mid);color:var(--mid);font-weight:500;}
+.rating-choice.selected.lancar{background:var(--good-tint);border-color:var(--good);color:var(--good);font-weight:500;}
 
-/* ---------- Modal (log entry) ---------- */
+/* ---------- Modal ---------- */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(31,33,29,0.45);display:flex;align-items:flex-end;justify-content:center;
-  z-index:50;
+  position:fixed;inset:0;background:rgba(37,43,40,0.42);display:flex;align-items:flex-end;justify-content:center;
+  z-index:60;animation:fade .15s ease;
 }
-@media (min-width:640px){ .modal-overlay{align-items:center;} }
+@media (min-width:640px){ .modal-overlay{align-items:center;padding:20px;} }
 .modal-sheet{
-  background:var(--ivory);border-radius:16px 16px 0 0;padding:22px 20px 28px;width:100%;max-width:520px;
-  max-height:88vh;overflow-y:auto;border-top:1px solid var(--border-beige);
+  background:var(--cream);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:10px 20px calc(26px + env(safe-area-inset-bottom));width:100%;max-width:520px;
+  max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:rise .2s ease;
 }
-@media (min-width:640px){ .modal-sheet{border-radius:14px;border:1px solid var(--border-beige);max-height:80vh;} }
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.modal-close{background:none;border:none;font-size:20px;color:var(--olive);cursor:pointer;line-height:1;}
+.modal-sheet::before{content:'';display:block;width:40px;height:4px;border-radius:4px;background:var(--sand);margin:0 auto 14px;}
+@media (min-width:640px){ .modal-sheet{border-radius:var(--r-lg);max-height:82vh;padding:24px 24px 26px;} .modal-sheet::before{display:none;} }
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;}
+.modal-header h3{font-size:21px;}
+.modal-close{background:var(--surface);border:1px solid var(--line);width:36px;height:36px;border-radius:50%;font-size:20px;color:var(--muted);cursor:pointer;line-height:1;flex:0 0 auto;}
+.modal-close:hover{color:var(--ink);}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
 
-/* ---------- Setup / Rancang ---------- */
-.setup-section{margin-bottom:26px;}
-.setup-section h3{font-size:17px;margin-bottom:6px;}
-.surah-picker{max-height:280px;overflow-y:auto;border:1px solid var(--border-beige);border-radius:8px;padding:8px;background:var(--ivory);}
-.surah-picker-item{display:flex;align-items:center;gap:10px;padding:7px 8px;font-size:13.5px;border-radius:5px;}
-.surah-picker-item:hover{background:var(--cream);}
-.surah-picker-item input{flex:0 0 auto;}
-.juz-heading{font-size:11px;color:var(--olive);text-transform:uppercase;letter-spacing:0.05em;padding:8px 8px 2px;}
+.option-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-top:12px;cursor:pointer;transition:border-color .15s ease;}
+.option-card:hover{border-color:var(--gold);}
+.option-card .oc-icon{color:var(--gold);}
+.option-card .oc-title{font-size:15px;color:var(--ink);font-weight:500;}
+.option-card .oc-sub{font-size:12.5px;color:var(--muted);}
+.option-card .oc-chev{margin-left:auto;color:var(--faint);}
 
-/* ---------- Peta Hifz grid ---------- */
-.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 18px;font-size:12px;color:var(--olive);}
-.legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-.hifz-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
-@media (min-width:480px){ .hifz-grid{grid-template-columns:repeat(8,1fr);} }
-@media (min-width:700px){ .hifz-grid{grid-template-columns:repeat(10,1fr);} }
-.surah-cell{
-  position:relative;aspect-ratio:1;border-radius:6px;border:1px solid var(--border-beige);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
-  background:var(--ivory);font-size:10px;color:var(--olive);padding:2px;text-align:center;
-}
-.surah-cell .cno{font-family:var(--font-serif);font-size:13px;color:var(--charcoal);}
-.surah-cell.not_started{background:var(--ivory);}
-.surah-cell.in_progress{background:var(--soft-gold);border-color:var(--gold);}
-.surah-cell.in_progress .cno{color:var(--charcoal);}
-.surah-cell.memorised{background:var(--deep-green);border-color:var(--deep-green);}
-.surah-cell.memorised .cno{color:var(--ivory);}
-.surah-cell.needs_attention{background:var(--amber);border-color:var(--amber);}
-.surah-cell.needs_attention .cno{color:var(--ivory);}
-.juz-badge{position:absolute;top:-6px;left:-4px;background:var(--forest);color:var(--soft-gold);font-size:8px;
-  border-radius:8px;padding:1px 4px;line-height:1.4;}
-
-/* ---------- Surah detail modal ---------- */
-.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-beige);font-size:13.5px;}
+/* ---------- Detail rows ---------- */
+.detail-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;}
 .detail-row:last-child{border-bottom:none;}
-
-/* ---------- Riwayat ---------- */
-.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-.entry-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-beige);gap:10px;}
-.entry-row:last-child{border-bottom:none;}
-.entry-main{font-size:14px;}
-.entry-date{font-size:11.5px;color:var(--olive);margin-bottom:2px;}
-.type-badge{font-size:10.5px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
-.type-badge.new{background:var(--soft-gold);color:var(--charcoal);}
-.type-badge.murajaah_recent{background:var(--border-beige);color:var(--charcoal);}
-.type-badge.murajaah_old{background:var(--forest);color:var(--ivory);}
-.rating-tag{font-size:11px;margin-left:6px;}
-.rating-tag.lemah{color:var(--error);}
-.rating-tag.sederhana{color:var(--amber);}
-.rating-tag.lancar{color:var(--success);}
-.empty-state{padding:34px 16px;text-align:center;color:var(--olive);}
-.back-link{background:none;border:none;color:var(--olive);font-size:13.5px;cursor:pointer;margin-bottom:14px;padding:0;}
-.back-link:hover{color:var(--charcoal);}
-footer.page-footer{padding:16px 20px 26px;text-align:center;font-size:11.5px;color:var(--olive);}
-
-[tabindex]:focus-visible, button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+.detail-row .dr-label{display:flex;align-items:center;gap:10px;color:var(--muted);}
+.detail-row .dr-label .icon{color:var(--gold);width:18px;height:18px;}
+.detail-row > span:last-child{text-align:right;}
 
 /* ---------- Assessment wizard ---------- */
-.progress-track{height:6px;background:var(--border-beige);border-radius:4px;overflow:hidden;margin-bottom:24px;}
-.progress-fill{height:100%;background:var(--gold);transition:width .2s ease;}
-.quiz-footer{display:flex;justify-content:space-between;margin-top:24px;}
+.wizard-head{margin:6px 0 22px;}
+.wizard-step{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+.progress-track{height:4px;background:var(--sand);border-radius:var(--r-pill);overflow:hidden;}
+.progress-fill{height:100%;background:var(--green);transition:width .25s ease;border-radius:var(--r-pill);}
+.wizard-body h2{font-size:28px;}
+.wizard-body > p.muted{margin-bottom:22px;font-size:14px;}
+.quiz-footer{display:flex;justify-content:space-between;gap:12px;margin-top:26px;}
+.surah-picker{max-height:300px;overflow-y:auto;border:1px solid var(--line-strong);border-radius:var(--r-md);padding:6px;background:var(--surface);}
+.surah-picker-item{display:flex;align-items:center;gap:10px;padding:9px 10px;font-size:14px;border-radius:var(--r-sm);cursor:pointer;}
+.surah-picker-item:hover{background:var(--cream-deep);}
+.surah-picker-item input{flex:0 0 auto;width:18px;height:18px;accent-color:var(--green);}
+.juz-heading{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;padding:12px 10px 4px;font-weight:500;}
+.summary-note{background:var(--gold-tint);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;font-size:13.5px;color:var(--ink);}
+.summary-note strong{color:var(--green);}
 
-/* ---------- Rancang dashboard ---------- */
-.dash-section{margin-bottom:22px;}
-.dash-section h3{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.dash-card{background:var(--cream);border:1px solid var(--border-beige);border-radius:10px;padding:18px;}
-.dash-card.prominent{border-color:var(--gold);border-width:1.5px;}
+/* ---------- Rancang ---------- */
+.plan-summary{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);margin-bottom:24px;}
+.plan-summary > div{padding:16px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.plan-summary > div + div{border-left:1px solid var(--line);}
+.plan-summary .icon{color:var(--gold);width:26px;height:26px;margin-bottom:4px;}
+.plan-summary .ps-label{font-size:13.5px;color:var(--ink);font-weight:500;}
+.plan-summary .ps-val{font-size:12.5px;color:var(--muted);line-height:1.4;}
 
-.ring-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
-.ring-svg{flex:0 0 auto;}
-.ring-stats{flex:1;min-width:140px;}
-.ring-big{font-family:var(--font-serif);font-size:30px;color:var(--deep-green);line-height:1.1;}
-.ring-sub{font-size:12.5px;color:var(--olive);margin-top:2px;}
-
-.bar-track{height:10px;background:var(--border-beige);border-radius:6px;overflow:hidden;margin:10px 0;}
-.bar-fill{height:100%;border-radius:6px;transition:width .2s ease;}
-.bar-fill.gold{background:var(--gold);}
-.bar-fill.green{background:var(--deep-green);}
-.stat-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--olive);margin-top:8px;}
-.stat-row strong{color:var(--charcoal);font-weight:600;}
+.rancang-grid{display:grid;gap:22px;}
+@media (min-width:860px){ .rancang-grid{grid-template-columns:1fr 1fr;} .rancang-grid .span-2{grid-column:span 2;} }
+.dash-section{min-width:0;}
+.dash-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);}
+.ring-wrap{display:flex;align-items:center;gap:20px;}
+.ring-stats{flex:1;min-width:0;}
+.ring-big{font-family:var(--font-serif);font-size:30px;color:var(--ink);line-height:1.1;}
+.ring-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+.stat-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13.5px;color:var(--muted);padding:6px 0;}
+.stat-row strong{color:var(--ink);font-weight:500;}
 
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.day-card{
-  border:1px solid var(--border-beige);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;
-  background:var(--ivory);font-size:11px;color:var(--olive);
+.day-card{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;padding:4px 0;font-family:var(--font-sans);}
+.day-card .dname{font-size:12.5px;color:var(--muted);font-weight:500;}
+.day-card .dbox{width:100%;max-width:42px;aspect-ratio:1;border-radius:10px;border:1px solid var(--line-strong);background:var(--sand-soft);display:flex;align-items:center;justify-content:center;color:var(--cream);transition:transform .15s ease;}
+.day-card:hover .dbox{transform:translateY(-1px);}
+.day-card.active .dbox{background:var(--green);border-color:var(--green);}
+.day-card.active .dname{color:var(--green);}
+.day-card .dbox .icon{width:18px;height:18px;}
+.week-hint{font-size:12.5px;color:var(--muted);margin:14px 0 0;}
+
+.settings-list{display:flex;flex-direction:column;gap:10px;}
+.settings-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;min-height:62px;cursor:pointer;font-family:var(--font-sans);color:var(--ink);transition:border-color .15s ease,background .15s ease;box-shadow:var(--shadow-sm);}
+.settings-row:hover{border-color:var(--gold);}
+.settings-row .icon{color:var(--gold);}
+.settings-row .sr-title{display:block;font-size:15px;font-weight:500;}
+.settings-row .sr-sub{display:block;font-size:12.5px;color:var(--muted);}
+.settings-row .sr-chev{margin-left:auto;color:var(--ink);opacity:.7;}
+
+/* ---------- Peta Hifz ---------- */
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0 0 18px;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;}
+.legend span{display:flex;align-items:center;gap:10px;}
+.legend .count{color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums;}
+.legend-dot{display:inline-block;width:18px;height:18px;border-radius:5px;flex:0 0 auto;border:1px solid transparent;}
+@media (min-width:720px){ .legend{grid-template-columns:repeat(4,1fr);} .legend .count{margin-left:0;} }
+.hifz-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;}
+@media (min-width:420px){ .hifz-grid{grid-template-columns:repeat(7,1fr);} }
+@media (min-width:600px){ .hifz-grid{grid-template-columns:repeat(10,1fr);gap:8px;} }
+@media (min-width:1100px){ .hifz-grid{grid-template-columns:repeat(12,1fr);} }
+.surah-cell{
+  position:relative;aspect-ratio:1;border-radius:var(--r-sm);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:var(--sand-soft);color:var(--ink);padding:2px;text-align:center;
+  box-shadow:var(--shadow-sm);transition:transform .12s ease, box-shadow .12s ease;font-family:inherit;
 }
-.day-card .dname{font-family:var(--font-serif);font-size:13px;color:var(--charcoal);margin-bottom:4px;}
-.day-card.active{background:var(--deep-green);border-color:var(--deep-green);}
-.day-card.active .dname{color:var(--ivory);}
-.day-card.active .ddot{color:var(--soft-gold);}
-.day-card .ddot{font-size:9px;}
+.surah-cell:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
+.surah-cell .cno{font-family:var(--font-serif);font-size:16px;line-height:1;}
+.surah-cell.not_started{background:var(--sand-soft);}
+.surah-cell.in_progress{background:var(--gold);border-color:var(--gold);}
+.surah-cell.in_progress .cno{color:#fff;}
+.surah-cell.memorised{background:var(--green);border-color:var(--green);}
+.surah-cell.memorised .cno{color:var(--cream);}
+.surah-cell.needs_attention{background:var(--attn);border-color:var(--attn);}
+.surah-cell.needs_attention .cno{color:#fff;}
+.juz-badge{position:absolute;top:3px;left:4px;font-size:8.5px;line-height:1;font-weight:500;color:var(--muted);letter-spacing:0.02em;}
+.surah-cell.memorised .juz-badge, .surah-cell.in_progress .juz-badge, .surah-cell.needs_attention .juz-badge{color:rgba(255,255,255,0.78);}
+
+/* ---------- Riwayat ---------- */
+.filter-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-row .choice{flex:1;justify-content:center;min-width:fit-content;}
+@media (min-width:960px){ .filter-row .choice{flex:0 0 auto;} }
+.month-group{margin-bottom:18px;}
+.month-label{display:inline-block;font-size:12.5px;font-weight:500;color:var(--ink);background:var(--sand-soft);border-radius:var(--r-pill);padding:5px 12px;margin:0 0 6px;}
+.timeline{list-style:none;margin:0;padding:0;}
+.entry-row{display:grid;grid-template-columns:62px 28px 1fr auto;align-items:start;gap:10px;padding:13px 0;border-bottom:1px solid var(--line);position:relative;}
+.timeline .entry-row:last-child{border-bottom:none;}
+.entry-date{font-size:12.5px;color:var(--muted);padding-top:2px;position:relative;padding-left:16px;white-space:nowrap;}
+.entry-date::before{content:'';position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--gold);}
+.timeline .entry-row::before{content:'';position:absolute;left:3px;top:0;bottom:0;width:1px;background:var(--line-strong);}
+.timeline .entry-row:first-child::before{top:21px;}
+.timeline .entry-row:last-child::before{bottom:calc(100% - 21px);}
+.entry-type-icon{color:var(--gold);padding-top:1px;}
+.entry-main{font-size:14px;min-width:0;}
+.entry-title{font-weight:500;color:var(--ink);}
+.entry-detail{color:var(--ink);opacity:.85;}
+.entry-note{font-size:12.5px;color:var(--muted);margin-top:3px;font-style:italic;overflow-wrap:anywhere;}
+.rating-tag{font-size:11.5px;padding:3px 10px;border-radius:var(--r-pill);white-space:nowrap;font-weight:500;align-self:center;}
+.rating-tag.lemah{color:var(--weak);background:var(--weak-tint);}
+.rating-tag.sederhana{color:var(--mid);background:var(--mid-tint);}
+.rating-tag.lancar{color:var(--good);background:var(--good-tint);}
+.type-badge{font-size:11px;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap;background:var(--sand-soft);color:var(--ink);}
+.type-badge.new{background:var(--gold-tint);}
+.type-badge.murajaah{background:var(--green-tint);color:var(--green);}
+.history-mini .entry-row{grid-template-columns:1fr auto;padding:10px 0;}
+.history-mini .entry-row::before{display:none;}
+.history-mini .entry-date{padding-left:0;}
+.history-mini .entry-date::before{display:none;}
+.empty-state{padding:44px 16px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--r-lg);}
+.empty-state .icon{color:var(--gold);width:32px;height:32px;margin-bottom:8px;}
+.back-link{background:none;border:none;color:var(--muted);font-size:13.5px;cursor:pointer;margin-bottom:14px;padding:0;}
+
+[tabindex]:focus-visible, button:focus-visible, .choice:focus-visible, [data-surah-detail]:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
 
 </style>
 </head>
@@ -424,15 +603,26 @@ const I18N = {
     streakCurrent: 'Hari Berterusan', streakPct: 'Al-Quran Dihafal', streakLongest: 'Rekod Terbaik',
     allDoneTitle: 'Hari Ini Selesai', allDoneDesc: 'Hafalan baru dan murajaah hari ini telah dicatat. Teruskan esok.',
 
-    newCardTitle: '&#127793; Hafalan Baru', newCardTitleToday: '&#127793; Hafalan Baru Hari Ini',
+    newCardTitle: 'Hafalan Baru', newCardTitleToday: 'Hafalan Baru Hari Ini',
     newCardFullyDone: 'Al-Quran telah selesai dihafal sepenuhnya.',
-    newCardDoneToday: '&#10003; Sudah dicatat hari ini',
+    newCardDoneToday: 'Sudah dicatat hari ini',
     newCardContinueFrom: 'Sambung dari <strong>{surah}, ayat {ayah}</strong><br><span class="muted">Cadangan: hingga ayat {to}</span>',
+    newCardRange: 'Ayat {from} &ndash; {to}',
+    newCardSuggestHint: 'Cadangan sasaran hari ini',
+    greeting: 'Assalamu&rsquo;alaikum', todayPlan: 'Rancangan Hari Ini',
+    streakDaysVal: '{n} hari',
+    rancangDesc: 'Tetapkan pelan hafalan dan murajaah anda.',
+    rancangSummaryCycle: 'Kitaran',
+    planSettings: 'Tetapan Pelan', planSettingsHint: 'Ubah sasaran, hari dan kitaran murajaah',
+    calendarIntegration: 'Integrasi Google Calendar', calendarIntegrationHint: 'Tambah peringatan berulang ke kalendar anda',
+    riwayatDesc: 'Rekod hafalan dan murajaah anda.',
+    monthsShort: ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'],
+    monthsLong: ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'],
     newCardButton: 'Log Hafalan Baru',
 
-    murajaahCardTitle: '&#128260; Murajaah Hari Ini',
+    murajaahCardTitle: 'Murajaah Hari Ini',
     murajaahCardInactive: 'Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah.',
-    murajaahCardDoneToday: '&#10003; Sudah dicatat hari ini',
+    murajaahCardDoneToday: 'Sudah dicatat hari ini',
     murajaahCardCycleProgress: 'Hari {day} daripada {total} &middot; {done}/{all} Juz selesai kitaran ini',
     murajaahCardBonus: 'Tambahan (jika sempat): {list}',
     murajaahCardButton: 'Log Murajaah',
@@ -440,26 +630,26 @@ const I18N = {
 
     // ---- Rancang dashboard ----
     rancangTitle: 'Rancangan Hifz Anda',
-    dashHifzProgress: '&#128214; Kemajuan Hifz',
-    dashJuzOf30: '{n} <span style="font-size:16px;color:var(--olive);">/ 30 Juz</span>',
+    dashHifzProgress: 'Kemajuan Hifz',
+    dashJuzOf30: '{n} <span class="unit">/ 30 Juz</span>',
     dashPctOfQuran: '{pct}% daripada keseluruhan Al-Quran',
 
-    dashMurajaahCycle: '&#128260; Kitaran Murajaah',
+    dashMurajaahCycle: 'Kitaran Murajaah',
     dashMurajaahInactive: 'Belum ada Juzuk yang dihafal sepenuhnya untuk dimurajaah lagi.',
     dashCycleProgress: 'Kemajuan kitaran', dashCycleProgressVal: '{done}/{all} Juz selesai',
     dashRemainingJuz: 'Baki Juzuk', dashRemainingJuzVal: '{n} Juz',
     dashDailyTarget: 'Sasaran harian', dashDailyTargetVal: '{n} Juz/hari',
     dashDaysRemaining: 'Anggaran hari berbaki', dashDaysRemainingVal: '{n} hari',
 
-    dashHafalanBaru: '&#127793; Hafalan Baru',
+    dashHafalanBaru: 'Hafalan Baru',
     dashQuranFullyDone: 'Al-Quran telah selesai dihafal sepenuhnya.',
     dashStartingPoint: 'Titik permulaan',
     dashProgressIn: 'Kemajuan dalam {surah}', dashProgressInVal: '{done}/{total} ayat',
     dashDailyTargetPace: 'Sasaran harian',
 
-    dashWeeklyPlan: '&#128197; Rancangan Mingguan',
+    dashWeeklyPlan: 'Rancangan Mingguan',
     dashWeeklyPlanHint: 'Ketik hari untuk lihat butiran. Murajaah berlaku setiap hari aktif.',
-    dashAddToCalendar: '&#65291; Tambah ke Kalendar',
+    dashAddToCalendar: 'Tambah ke Kalendar',
     editPlan: 'Ubah Rancangan',
 
     positionQuranDone: 'Al-Quran selesai dihafal',
@@ -491,7 +681,7 @@ const I18N = {
     calendarOpenNewTab: 'Buka Google Calendar dalam tab baharu',
 
     dayDetailInactive: 'Bukan hari aktif dalam rancangan anda.',
-    dayDetailHafalanBaru: '&#127793; Hafalan Baru', dayDetailMurajaah: '&#128260; Murajaah', dayDetailMasa: '&#128337; Masa',
+    dayDetailHafalanBaru: 'Hafalan Baru', dayDetailMurajaah: 'Murajaah', dayDetailMasa: 'Masa',
 
     surahDetailTotalAyah: 'Jumlah Ayat', surahDetailStatus: 'Status',
     statusNotStarted: 'Belum Bermula', statusInProgress: 'Sedang Dihafal', statusMemorised: 'Dihafal',
@@ -577,15 +767,26 @@ const I18N = {
     streakCurrent: 'Day Streak', streakPct: 'Quran Memorised', streakLongest: 'Best Record',
     allDoneTitle: 'All Done for Today', allDoneDesc: "Today's new memorisation and murajaah have been logged. Continue tomorrow.",
 
-    newCardTitle: '&#127793; New Memorisation', newCardTitleToday: '&#127793; New Memorisation Today',
+    newCardTitle: 'New Memorisation', newCardTitleToday: 'New Memorisation Today',
     newCardFullyDone: 'The whole Quran has been fully memorised.',
-    newCardDoneToday: '&#10003; Already logged today',
+    newCardDoneToday: 'Already logged today',
     newCardContinueFrom: 'Continue from <strong>{surah}, ayah {ayah}</strong><br><span class="muted">Suggested: up to ayah {to}</span>',
+    newCardRange: 'Ayah {from} &ndash; {to}',
+    newCardSuggestHint: "Today&rsquo;s suggested target",
+    greeting: 'Assalamu&rsquo;alaikum', todayPlan: 'Today&rsquo;s Plan',
+    streakDaysVal: '{n} days',
+    rancangDesc: 'Set your memorisation and murajaah plan.',
+    rancangSummaryCycle: 'Cycle',
+    planSettings: 'Plan Settings', planSettingsHint: 'Change targets, days and murajaah cycle',
+    calendarIntegration: 'Google Calendar Integration', calendarIntegrationHint: 'Add recurring reminders to your calendar',
+    riwayatDesc: 'Your memorisation and murajaah records.',
+    monthsShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    monthsLong: ['January','February','March','April','May','June','July','August','September','October','November','December'],
     newCardButton: 'Log New Memorisation',
 
-    murajaahCardTitle: '&#128260; Murajaah Today',
+    murajaahCardTitle: 'Murajaah Today',
     murajaahCardInactive: 'No Juz has been fully memorised yet to revise.',
-    murajaahCardDoneToday: '&#10003; Already logged today',
+    murajaahCardDoneToday: 'Already logged today',
     murajaahCardCycleProgress: 'Day {day} of {total} &middot; {done}/{all} Juz done this cycle',
     murajaahCardBonus: 'Bonus (if you have time): {list}',
     murajaahCardButton: 'Log Murajaah',
@@ -593,26 +794,26 @@ const I18N = {
 
     // ---- Rancang dashboard ----
     rancangTitle: 'Your Hifz Plan',
-    dashHifzProgress: '&#128214; Hifz Progress',
-    dashJuzOf30: '{n} <span style="font-size:16px;color:var(--olive);">/ 30 Juz</span>',
+    dashHifzProgress: 'Hifz Progress',
+    dashJuzOf30: '{n} <span class="unit">/ 30 Juz</span>',
     dashPctOfQuran: '{pct}% of the whole Quran',
 
-    dashMurajaahCycle: '&#128260; Murajaah Cycle',
+    dashMurajaahCycle: 'Murajaah Cycle',
     dashMurajaahInactive: 'No Juz has been fully memorised yet to revise.',
     dashCycleProgress: 'Cycle progress', dashCycleProgressVal: '{done}/{all} Juz done',
     dashRemainingJuz: 'Juz remaining', dashRemainingJuzVal: '{n} Juz',
     dashDailyTarget: 'Daily target', dashDailyTargetVal: '{n} Juz/day',
     dashDaysRemaining: 'Estimated days left', dashDaysRemainingVal: '{n} days',
 
-    dashHafalanBaru: '&#127793; New Memorisation',
+    dashHafalanBaru: 'New Memorisation',
     dashQuranFullyDone: 'The whole Quran has been fully memorised.',
     dashStartingPoint: 'Starting point',
     dashProgressIn: 'Progress in {surah}', dashProgressInVal: '{done}/{total} ayah',
     dashDailyTargetPace: 'Daily target',
 
-    dashWeeklyPlan: '&#128197; Weekly Plan',
+    dashWeeklyPlan: 'Weekly Plan',
     dashWeeklyPlanHint: 'Tap a day to see details. Murajaah happens on every active day.',
-    dashAddToCalendar: '&#65291; Add to Calendar',
+    dashAddToCalendar: 'Add to Calendar',
     editPlan: 'Adjust Plan',
 
     positionQuranDone: 'Quran fully memorised',
@@ -644,7 +845,7 @@ const I18N = {
     calendarOpenNewTab: 'Open Google Calendar in a new tab',
 
     dayDetailInactive: 'Not an active day in your plan.',
-    dayDetailHafalanBaru: '&#127793; New Memorisation', dayDetailMurajaah: '&#128260; Murajaah', dayDetailMasa: '&#128337; Time',
+    dayDetailHafalanBaru: 'New Memorisation', dayDetailMurajaah: 'Murajaah', dayDetailMasa: 'Time',
 
     surahDetailTotalAyah: 'Total Ayah', surahDetailStatus: 'Status',
     statusNotStarted: 'Not Started', statusInProgress: 'In Progress', statusMemorised: 'Memorised',
@@ -1017,8 +1218,76 @@ function escapeHtml(s){
 
 const app = document.getElementById('app');
 
+// ===================== Icons (minimal line set) =====================
+// Presentation only. Each is a 24x24 stroke icon that inherits currentColor.
+const ICON_PATHS = {
+  book: '<path d="M12 6.6c-1.9-1.4-4.4-2.1-7.6-2.1v13.1c3.2 0 5.7.7 7.6 2.1 1.9-1.4 4.4-2.1 7.6-2.1V4.5c-3.2 0-5.7.7-7.6 2.1z"/><path d="M12 6.6v13.1"/>',
+  refresh: '<path d="M19.5 10.5A7.6 7.6 0 0 0 6 7.2L4.5 9"/><path d="M4.5 4.8V9h4.2"/><path d="M4.5 13.5A7.6 7.6 0 0 0 18 16.8l1.5-1.8"/><path d="M19.5 19.2V15h-4.2"/>',
+  calendar: '<rect x="3.75" y="5.25" width="16.5" height="15" rx="2.25"/><path d="M3.75 9.75h16.5M8.25 3v4.5M15.75 3v4.5"/>',
+  calendarPlus: '<rect x="3.75" y="5.25" width="16.5" height="15" rx="2.25"/><path d="M3.75 9.75h16.5M8.25 3v4.5M15.75 3v4.5M12 12.5v5M9.5 15h5"/>',
+  grid: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  home: '<path d="M4.5 10.2 12 4l7.5 6.2v8.6c0 .9-.7 1.7-1.7 1.7H15v-5.8H9v5.8H6.2c-1 0-1.7-.8-1.7-1.7z"/>',
+  chart: '<path d="M5.5 19.5v-5M10 19.5v-9M14.5 19.5v-6.5M19 19.5V5"/>',
+  flame: '<path d="M12 20.5c3.5 0 6-2.3 6-5.6 0-3.6-2.6-5.5-3.7-8.4-.5 1.9-1.4 3-2.6 3.5.3-2.8-.9-5.4-3.2-7.5.2 3.6-4.5 6.3-4.5 11.5 0 3.7 3 6.5 8 6.5z"/>',
+  trophy: '<path d="M8 4h8v5.2a4 4 0 0 1-8 0z"/><path d="M8 6H5.2a3 3 0 0 0 3.1 3.9M16 6h2.8a3 3 0 0 1-3.1 3.9M12 13.2V17M9 20h6M10 17h4"/>',
+  check: '<path d="M5.5 12.5l4.2 4.2L18.5 8"/>',
+  play: '<path d="M8 5.8v12.4l9.6-6.2z"/>',
+  chevron: '<path d="M9.5 6l6 6-6 6"/>',
+  sliders: '<path d="M4 7h9.5M18.5 7H20M4 17h3.5M12.5 17H20"/><circle cx="16" cy="7" r="2.3"/><circle cx="10" cy="17" r="2.3"/>'
+};
+function icon(name, cls){
+  return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]||''}</svg>`;
+}
+// Subtle line illustration for the Utama greeting (decorative, aria-hidden).
+const HERO_ART = `<svg class="hero-art" viewBox="0 0 170 112" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M4 108h162"/>
+  <path d="M46 108V74h76v34"/><path d="M42 74h84"/>
+  <path d="M56 74c0-15 12-24 28-31 16 7 28 16 28 31"/><path d="M84 43v-9"/><circle cx="84" cy="31" r="2.2"/>
+  <path d="M75 108V93a9 9 0 0 1 18 0v15"/>
+  <path d="M56 98v-8a4.5 4.5 0 0 1 9 0v8M103 98v-8a4.5 4.5 0 0 1 9 0v8"/>
+  <path d="M136 108V46h11v62"/><path d="M134 46h15"/><path d="M136 46l5.5-15 5.5 15"/><path d="M141.5 31v-6"/><path d="M134 72h15M134 92h15"/>
+  <path d="M138.5 58v5M144.5 58v5"/>
+  <path d="M20 108V62h9v46"/><path d="M18 62h13"/><path d="M20 62l4.5-11 4.5 11"/><path d="M24.5 51v-5"/><path d="M18 84h13"/>
+</svg>`;
+
+// ===================== Small view helpers =====================
+const WEEKDAY_BY_JSDAY = ['ahad','isnin','selasa','rabu','khamis','jumaat','sabtu'];
+function longDateLabel(d){
+  const wd = WEEKDAYS.find(w => w.key === WEEKDAY_BY_JSDAY[d.getDay()]);
+  return `${t(wd.labelKey)}, ${d.getDate()} ${t('monthsShort')[d.getMonth()]} ${d.getFullYear()}`;
+}
+function shortDateLabel(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return `${d} ${t('monthsShort')[m-1]}`;
+}
+function monthLabel(dateStr){
+  const [y,m] = dateStr.split('-').map(Number);
+  return `${t('monthsLong')[m-1]} ${y}`;
+}
+function miniRing(pct, size, color){
+  size = size || 62;
+  const sw = 5, r = (size/2) - sw, c = 2*Math.PI*r, mid = size/2;
+  const clamped = Math.min(100, Math.max(0, pct||0));
+  const offset = c * (1 - clamped/100);
+  return `<span class="ring" style="width:${size}px;height:${size}px;">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+      <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="var(--sand)" stroke-width="${sw}"/>
+      ${clamped>0 ? `<circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="${color||'var(--green)'}" stroke-width="${sw}"
+        stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 ${mid} ${mid})"/>` : ''}
+    </svg><span class="ring-label">${clamped}%</span></span>`;
+}
+function pageHeadHtml(iconName, title, desc){
+  return `<header class="page-head"><div class="head-icon">${icon(iconName)}</div><h2>${title}</h2>${desc?`<p>${desc}</p>`:''}</header>`;
+}
+function closeBtnHtml(){ return `<button class="modal-close" data-action="close-modal" aria-label="Close">&times;</button>`; }
+
 function render(){
-  app.innerHTML = navHtml() + '<main>' + screenHtml() + '</main>' + footerHtml() + modalHtml();
+  const hasNav = !['assessment','recommendation'].includes(STATE.screen);
+  app.innerHTML = `<div class="shell ${hasNav?'':'no-nav'}">`
+    + (hasNav ? navHtml() : '')
+    + `<div class="content">${topbarHtml()}<main>${screenHtml()}</main>${footerHtml()}</div>`
+    + `</div>` + modalHtml();
   bindEvents();
 }
 function go(screen){
@@ -1031,7 +1300,7 @@ function go(screen){
 function openModal(modal){ STATE.modal = modal; render(); }
 function closeModal(){ STATE.modal = null; render(); }
 
-// ===================== Nav / footer =====================
+// ===================== Nav / topbar / footer =====================
 function langToggleHtml(){
   return `
   <div class="lang-toggle" id="langToggle" role="group" aria-label="Language / Bahasa">
@@ -1039,24 +1308,22 @@ function langToggleHtml(){
     <button type="button" data-lang="en" class="${LANG==='en'?'active':''}" aria-pressed="${LANG==='en'}">EN</button>
   </div>`;
 }
+function topbarHtml(){
+  return `<div class="topbar"><div class="brand">${icon('book')} ${t('brand')}</div>${langToggleHtml()}</div>`;
+}
+const NAV_ITEMS = [
+  {key:'utama', labelKey:'navUtama', icon:'home'}, {key:'rancang', labelKey:'navRancang', icon:'calendar'},
+  {key:'petahifz', labelKey:'navPetaHifz', icon:'grid'}, {key:'riwayat', labelKey:'navRiwayat', icon:'clock'},
+];
 function navHtml(){
-  if(['assessment','recommendation'].includes(STATE.screen)){
-    return `<div class="nav"><div class="brand"><span class="mark">Q</span> ${t('brand')}</div>${langToggleHtml()}</div>`;
-  }
-  const items = [
-    {key:'utama', labelKey:'navUtama'}, {key:'rancang', labelKey:'navRancang'},
-    {key:'petahifz', labelKey:'navPetaHifz'}, {key:'riwayat', labelKey:'navRiwayat'},
-  ];
   return `
-  <div class="nav">
-    <div class="brand"><span class="mark">Q</span> ${t('brand')}</div>
-    <div class="nav-right">
-      <div class="navlinks">
-        ${items.map(it => `<button data-nav="${it.key}" class="${STATE.screen===it.key?'active':''}">${t(it.labelKey)}</button>`).join('')}
-      </div>
-      ${langToggleHtml()}
+  <nav class="appnav" aria-label="${t('brand')}">
+    <div class="nav-brand brand">${icon('book')} ${t('brand')}</div>
+    <div class="nav-items">
+      ${NAV_ITEMS.map(it => `<button type="button" data-nav="${it.key}" class="nav-item ${STATE.screen===it.key?'active':''}" ${STATE.screen===it.key?'aria-current="page"':''}>${icon(it.icon)}<span>${t(it.labelKey)}</span></button>`).join('')}
     </div>
-  </div>`;
+    <div class="nav-foot">${t('footerNote')}</div>
+  </nav>`;
 }
 function footerHtml(){
   return `<footer class="page-footer">${t('footerNote')}</footer>`;
@@ -1111,12 +1378,14 @@ function assessmentHtml(){
   else body = assessmentStep4();
 
   return `
-  <p class="muted">${t('stepOf', {step, total:totalSteps})}</p>
-  <div class="progress-track"><div class="progress-fill" style="width:${(step/totalSteps)*100}%"></div></div>
-  ${body}
+  <div class="wizard-head">
+    <div class="wizard-step">${t('stepOf', {step, total:totalSteps})}</div>
+    <div class="progress-track"><div class="progress-fill" style="width:${(step/totalSteps)*100}%"></div></div>
+  </div>
+  <div class="wizard-body">${body}</div>
   <div class="quiz-footer">
     ${step>1 ? `<button class="btn btn-secondary" data-action="assess-back">${t('stepBack')}</button>` : `<span></span>`}
-    <button class="btn btn-primary" data-action="assess-next">${step<totalSteps ? t('stepNext') : t('stepSeeRecommendation')}</button>
+    <button class="btn btn-primary" data-action="assess-next">${step<totalSteps ? t('stepNext') : t('stepSeeRecommendation')} ${icon('chevron','icon-sm')}</button>
   </div>`;
 }
 
@@ -1176,7 +1445,7 @@ function assessmentStep2(){
       <div class="choice ${isCustom?'selected':''}" data-set-assess="pageFraction:custom">${t('step2Custom')}</div>
     </div>
     ${isCustom ? `
-    <div class="row2" style="margin-top:12px;">
+    <div class="row2" style="margin-top:14px;">
       <div class="field"><label>${t('step2CustomPagesLabel')}</label><input type="number" min="0.1" step="0.1" data-form-field="customPages" value="${f.customPages||''}" placeholder="${t('step2CustomPagesPlaceholder')}"></div>
       <div class="field"><label>${t('step2CustomAyatLabel')}</label><input type="number" min="1" data-form-field="customAyat" value="${f.customAyat||''}" placeholder="${t('step2CustomAyatPlaceholder')}"></div>
     </div>` : ''}
@@ -1223,7 +1492,7 @@ function assessmentStep4(){
       ${CAPACITY_PRESETS.map(c => `<div class="choice ${f.capacity===c.key?'selected':''}" data-set-assess="capacity:${c.key}">${t(c.labelKey)} <span class="muted">${t(c.hintKey)}</span></div>`).join('')}
       <div class="choice ${![0.5,1,2].includes(f.capacity)?'selected':''}" data-set-assess="capacity:custom">${t('step2Custom')}</div>
     </div>
-    ${![0.5,1,2].includes(f.capacity) ? `<div class="field" style="margin-top:12px;"><label>${t('step4CapacityCustomLabel')}</label><input type="number" min="0.5" step="0.5" data-form-field="capacity" value="${f.capacity}"></div>` : ''}
+    ${![0.5,1,2].includes(f.capacity) ? `<div class="field" style="margin-top:14px;"><label>${t('step4CapacityCustomLabel')}</label><input type="number" min="0.5" step="0.5" data-form-field="capacity" value="${f.capacity}"></div>` : ''}
   </div>
   <div class="field">
     <label>${t('step4CycleQuestion')}</label>
@@ -1231,11 +1500,9 @@ function assessmentStep4(){
       ${CYCLE_PRESETS.map(c => `<div class="choice ${f.cycleDays===c?'selected':''}" data-set-assess="cycleDays:${c}">${t('step4CycleDaysOption',{n:c})}</div>`).join('')}
       <div class="choice ${!CYCLE_PRESETS.includes(f.cycleDays)?'selected':''}" data-set-assess="cycleDays:custom">${t('step2Custom')}</div>
     </div>
-    ${!CYCLE_PRESETS.includes(f.cycleDays) ? `<div class="field" style="margin-top:12px;"><input type="number" min="3" max="30" data-form-field="cycleDays" value="${f.cycleDays}"></div>` : ''}
+    ${!CYCLE_PRESETS.includes(f.cycleDays) ? `<div class="field" style="margin-top:14px;"><input type="number" min="3" max="30" data-form-field="cycleDays" value="${f.cycleDays}"></div>` : ''}
   </div>
-  <div class="card">
-    <p class="muted" style="margin:0;">${t('step4SummaryCard', {juz:approxJuz, perDay:juzPerDay, cycle:cycleDays})}</p>
-  </div>
+  <div class="summary-note">${t('step4SummaryCard', {juz:approxJuz, perDay:juzPerDay, cycle:cycleDays})}</div>
   `;
 }
 
@@ -1250,16 +1517,15 @@ function recommendationHtml(){
   const daysLabel = [...f.activeDays].map(k => t((WEEKDAYS.find(d=>d.key===k)||{}).labelKey)).join(', ') || '&mdash;';
 
   return `
-  <h2>${t('recTitle')}</h2>
-  <p class="muted">${t('recDesc')}</p>
-  <div class="card" style="margin-top:16px;">
-    <div class="detail-row"><span>&#127793; ${t('recHafalanBaru')}</span><span><strong>${paceLabel}</strong> &middot; ${t('recPerWeek',{n:f.hafalanDaysPerWeek})}</span></div>
-    <div class="detail-row"><span>&#128260; ${t('recMurajaah')}</span><span><strong>${t('recJuzPerDay',{n:juzPerDay})}</strong> &middot; ${t('recPerCycle',{n:cycleDays})}</span></div>
-    <div class="detail-row"><span>&#128337; ${t('recMasa')}</span><span>${timeLabel}</span></div>
-    <div class="detail-row"><span>&#128197; ${t('recHariAktif')}</span><span>${daysLabel}</span></div>
+  ${pageHeadHtml('book', t('recTitle'), t('recDesc'))}
+  <div class="card">
+    <div class="detail-row"><span class="dr-label">${icon('book')} ${t('recHafalanBaru')}</span><span><strong>${paceLabel}</strong> &middot; ${t('recPerWeek',{n:f.hafalanDaysPerWeek})}</span></div>
+    <div class="detail-row"><span class="dr-label">${icon('refresh')} ${t('recMurajaah')}</span><span><strong>${t('recJuzPerDay',{n:juzPerDay})}</strong> &middot; ${t('recPerCycle',{n:cycleDays})}</span></div>
+    <div class="detail-row"><span class="dr-label">${icon('clock')} ${t('recMasa')}</span><span>${timeLabel}</span></div>
+    <div class="detail-row"><span class="dr-label">${icon('calendar')} ${t('recHariAktif')}</span><span>${daysLabel}</span></div>
   </div>
-  <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
-    <button class="btn btn-primary" data-action="accept-recommendation">${t('recAccept')}</button>
+  <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;">
+    <button class="btn btn-primary" data-action="accept-recommendation">${icon('check')} ${t('recAccept')}</button>
     <button class="btn btn-secondary" data-action="adjust-recommendation">${t('recAdjust')}</button>
   </div>
   `;
@@ -1268,71 +1534,107 @@ function recommendationHtml(){
 // ===================== UTAMA (Home) =====================
 function utamaHtml(){
   const todayDone = isTodayComplete();
-  const s = PROGRESS.streak;
-  const pct = percentMemorised();
+  const hero = `
+  <section class="hero">
+    <div class="greet">${t('greeting')}</div>
+    <h2>${t('todayPlan')}</h2>
+    <div class="date">${longDateLabel(new Date())}</div>
+    ${HERO_ART}
+  </section>`;
 
-  if(todayDone){
-    return `
-    <h2>${t('utamaTitle')}</h2>
-    <div class="streak-strip">
-      <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">${t('streakCurrent')}</div></div>
-      <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">${t('streakPct')}</div></div>
-      <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">${t('streakLongest')}</div></div>
-    </div>
-    <div class="all-done-card">
+  const tasks = todayDone ? `
+    <div class="all-done-card span-2">
+      <div class="done-mark">${icon('check')}</div>
       <h2>${t('allDoneTitle')}</h2>
       <p>${t('allDoneDesc')}</p>
-    </div>`;
-  }
+    </div>` : newCardHtml() + murajaahCardHtml();
 
+  return `${hero}
+  <div class="utama-grid">
+    ${tasks}
+    ${progressCardHtml()}
+    ${statTilesHtml()}
+  </div>`;
+}
+
+function progressCardHtml(){
+  const juzCount = memorisedJuzList().length;
+  const pct = percentMemorised();
   return `
-  <h2>${t('utamaTitle')}</h2>
-  <div class="streak-strip">
-    <div class="streak-box"><div class="snum">${s.current}</div><div class="slabel">${t('streakCurrent')}</div></div>
-    <div class="streak-box"><div class="snum">${pct}%</div><div class="slabel">${t('streakPct')}</div></div>
-    <div class="streak-box"><div class="snum">${s.longest}</div><div class="slabel">${t('streakLongest')}</div></div>
-  </div>
-  ${newCardHtml()}
-  ${murajaahCardHtml()}
-  `;
+  <div class="progress-card">
+    <div class="pc-head">${icon('chart')}<div class="pc-title">${t('dashHifzProgress')}</div></div>
+    <div class="pc-row"><div class="pc-juz">${t('dashJuzOf30',{n:juzCount})}</div><div class="pc-pct">${pct}%</div></div>
+    <div class="bar-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${t('streakPct')}"><div class="bar-fill green" style="width:${pct}%;"></div></div>
+    <div class="muted">${t('dashPctOfQuran',{pct})}</div>
+  </div>`;
+}
+
+function statTilesHtml(){
+  const s = PROGRESS.streak;
+  return `
+  <div class="stat-tiles">
+    <div class="stat-tile">${icon('flame')}<div><div class="st-label">${t('streakCurrent')}</div><div class="st-val">${t('streakDaysVal',{n:s.current})}</div></div></div>
+    <div class="stat-tile">${icon('trophy')}<div><div class="st-label">${t('streakLongest')}</div><div class="st-val">${t('streakDaysVal',{n:s.longest})}</div></div></div>
+  </div>`;
+}
+
+function taskCardHtml(o){
+  return `
+  <div class="task-card ${o.cls||''}">
+    <div class="task-head">
+      <span class="task-icon">${icon(o.icon)}</span>
+      <div class="task-info">
+        <div class="task-title">${o.title}</div>
+        ${o.body||''}
+      </div>
+      ${o.ring||''}
+    </div>
+    ${o.footer||''}
+  </div>`;
 }
 
 function newCardHtml(){
   const sug = computeSuggestedNew();
   const doneToday = PROGRESS.entries.some(e => e.date===todayStr() && e.type==='new');
   if(!sug){
-    return `<div class="due-card empty"><div class="dctitle">${t('newCardTitle')}</div><div class="dcbody">${t('newCardFullyDone')}</div></div>`;
+    return taskCardHtml({ cls:'is-empty', icon:'book', title:t('newCardTitle'), body:`<div class="task-sub">${t('newCardFullyDone')}</div>` });
   }
   const surah = getSurah(sug.surah);
   if(doneToday){
-    return `<div class="due-card done"><div class="dctitle">${t('newCardTitleToday')}</div><div class="dc-check">${t('newCardDoneToday')}</div></div>`;
+    return taskCardHtml({ cls:'is-done', icon:'book', title:t('newCardTitleToday'),
+      body:`<div class="done-pill">${icon('check')} ${t('newCardDoneToday')}</div>` });
   }
-  return `
-  <div class="due-card">
-    <div class="dctitle">${t('newCardTitleToday')}</div>
-    <div class="dcbody">${t('newCardContinueFrom', {surah: escapeHtml(surah.name), ayah: sug.ayahFrom, to: sug.ayahToSuggested})}</div>
-    <button class="btn btn-accent btn-sm" data-action="log-new">${t('newCardButton')}</button>
-  </div>`;
+  const st = getSurahStatus(sug.surah);
+  const surahPct = Math.round(((st.memorisedUpTo||0)/surah.totalAyah)*100);
+  return taskCardHtml({
+    icon:'book', title:t('newCardTitleToday'),
+    body:`<div class="task-main">${escapeHtml(surah.name)}</div>
+      <div class="task-sub">${t('newCardRange',{from:sug.ayahFrom, to:sug.ayahToSuggested})}</div>
+      <div class="task-hint">${t('newCardSuggestHint')}</div>`,
+    ring:`<span title="${t('dashProgressIn',{surah:escapeHtml(surah.name)})}">${miniRing(surahPct, 62, 'var(--gold)')}</span>`,
+    footer:`<button class="btn btn-primary btn-block" data-action="log-new">${icon('play')} ${t('newCardButton')}</button>`
+  });
 }
 
 function murajaahCardHtml(){
   const m = computeTodaysMurajaah();
   if(!m.active){
-    return `<div class="due-card empty"><div class="dctitle">${t('murajaahCardTitle')}</div><div class="dcbody muted">${t('murajaahCardInactive')}</div></div>`;
+    return taskCardHtml({ cls:'is-empty', icon:'refresh', title:t('murajaahCardTitle'), body:`<div class="task-sub">${t('murajaahCardInactive')}</div>` });
   }
+  const cycleText = t('murajaahCardCycleProgress',{day:m.dayInCycle+1, total:m.cycleDays, done:m.completedThisCycle, all:m.totalJuz});
+  const cyclePct = m.totalJuz ? Math.round((m.completedThisCycle/m.totalJuz)*100) : 0;
+  const ring = `<span title="${t('dashCycleProgress')}">${miniRing(cyclePct, 62)}</span>`;
   if(m.doneToday){
-    return `<div class="due-card done"><div class="dctitle">${t('murajaahCardTitle')}</div><div class="dc-check">${t('murajaahCardDoneToday')}</div>
-      <div class="muted" style="margin-top:8px;">${t('murajaahCardCycleProgress',{day:m.dayInCycle+1, total:m.cycleDays, done:m.completedThisCycle, all:m.totalJuz})}</div></div>`;
+    return taskCardHtml({ cls:'is-done', icon:'refresh', title:t('murajaahCardTitle'), ring,
+      body:`<div class="task-sub">${cycleText}</div><div class="done-pill">${icon('check')} ${t('murajaahCardDoneToday')}</div>` });
   }
-  const juzLabel = t('juzListLabel', {list: m.dueJuz.map(j => t('positionJuz',{n:j})).join(', ')});
-  return `
-  <div class="due-card">
-    <div class="dctitle">${t('murajaahCardTitle')}</div>
-    <div class="dcbody"><strong>${juzLabel}</strong><br>
-      <span class="muted">${t('murajaahCardCycleProgress',{day:m.dayInCycle+1, total:m.cycleDays, done:m.completedThisCycle, all:m.totalJuz})}</span></div>
-    ${m.bonusWeak.length ? `<div class="muted" style="margin-bottom:10px;">${t('murajaahCardBonus',{list: escapeHtml(m.bonusWeak.join(', '))})}</div>` : ''}
-    <button class="btn btn-accent btn-sm" data-action="log-murajaah" data-juz="${m.dueJuz[0]}">${t('murajaahCardButton')}</button>
-  </div>`;
+  const juzLabel = t('juzListLabel', {list: m.dueJuz.join(', ')});
+  return taskCardHtml({
+    icon:'refresh', title:t('murajaahCardTitle'), ring,
+    body:`<div class="task-main">${juzLabel}</div><div class="task-sub">${cycleText}</div>
+      ${m.bonusWeak.length ? `<div class="bonus-note">${t('murajaahCardBonus',{list: escapeHtml(m.bonusWeak.join(', '))})}</div>` : ''}`,
+    footer:`<button class="btn btn-primary btn-block" data-action="log-murajaah" data-juz="${m.dueJuz[0]}">${icon('play')} ${t('murajaahCardButton')}</button>`
+  });
 }
 
 // ===================== RANCANG (interactive dashboard) =====================
@@ -1343,11 +1645,12 @@ function ringSvg(pct, size){
   const offset = c * (1 - Math.min(100,Math.max(0,pct))/100);
   const mid = size/2;
   return `
-  <svg class="ring-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="var(--border-beige)" stroke-width="9"/>
-    <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="var(--deep-green)" stroke-width="9"
+  <svg class="ring-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+    <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="var(--sand)" stroke-width="8"/>
+    <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="var(--green)" stroke-width="8"
       stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round"
-      transform="rotate(-90 ${mid} ${mid})"/>
+      transform="rotate(-90 ${mid} ${mid})" ${pct<=0?'stroke-opacity="0"':''}/>
+    <text x="${mid}" y="${mid}" text-anchor="middle" dominant-baseline="central" font-family="Inter, sans-serif" font-size="17" fill="var(--ink)">${pct}%</text>
   </svg>`;
 }
 
@@ -1355,8 +1658,8 @@ function hifzProgressDashHtml(){
   const juzCount = memorisedJuzList().length;
   const pct = percentMemorised();
   return `
-  <div class="dash-section">
-    <h3>${t('dashHifzProgress')}</h3>
+  <section class="dash-section">
+    <h3 class="section-title">${icon('chart')} ${t('dashHifzProgress')}</h3>
     <div class="dash-card">
       <div class="ring-wrap">
         ${ringSvg(pct)}
@@ -1366,34 +1669,33 @@ function hifzProgressDashHtml(){
         </div>
       </div>
     </div>
-  </div>`;
+  </section>`;
 }
 
 function murajaahCycleDashHtml(){
   const m = computeTodaysMurajaah();
-  const p = PROGRESS.plan;
   if(!m.active){
     return `
-    <div class="dash-section">
-      <h3>${t('dashMurajaahCycle')}</h3>
-      <div class="dash-card prominent"><p class="muted" style="margin:0;">${t('dashMurajaahInactive')}</p></div>
-    </div>`;
+    <section class="dash-section">
+      <h3 class="section-title">${icon('refresh')} ${t('dashMurajaahCycle')}</h3>
+      <div class="dash-card"><p class="muted" style="margin:0;">${t('dashMurajaahInactive')}</p></div>
+    </section>`;
   }
   const remaining = m.totalJuz - m.completedThisCycle;
   const daysRemaining = Math.max(0, m.cycleDays - m.dayInCycle - 1);
   const dailyTarget = juzPerDayForCycle(m.totalJuz, m.cycleDays);
   const fillPct = m.totalJuz ? Math.round((m.completedThisCycle/m.totalJuz)*100) : 0;
   return `
-  <div class="dash-section">
-    <h3>${t('dashMurajaahCycle')}</h3>
-    <div class="dash-card prominent">
-      <div class="stat-row" style="margin-top:0;"><span>${t('dashCycleProgress')}</span><strong>${t('dashCycleProgressVal',{done:m.completedThisCycle, all:m.totalJuz})}</strong></div>
+  <section class="dash-section">
+    <h3 class="section-title">${icon('refresh')} ${t('dashMurajaahCycle')}</h3>
+    <div class="dash-card">
+      <div class="stat-row"><span>${t('dashCycleProgress')}</span><strong>${t('dashCycleProgressVal',{done:m.completedThisCycle, all:m.totalJuz})}</strong></div>
       <div class="bar-track"><div class="bar-fill green" style="width:${fillPct}%;"></div></div>
       <div class="stat-row"><span>${t('dashRemainingJuz')}</span><strong>${t('dashRemainingJuzVal',{n:remaining})}</strong></div>
       <div class="stat-row"><span>${t('dashDailyTarget')}</span><strong>${t('dashDailyTargetVal',{n:dailyTarget})}</strong></div>
       <div class="stat-row"><span>${t('dashDaysRemaining')}</span><strong>${t('dashDaysRemainingVal',{n:daysRemaining})}</strong></div>
     </div>
-  </div>`;
+  </section>`;
 }
 
 function hafalanBaruDashHtml(){
@@ -1402,24 +1704,24 @@ function hafalanBaruDashHtml(){
   const paceLabel = calPaceLabel(p.paceTarget);
   if(!sug){
     return `
-    <div class="dash-section">
-      <h3>${t('dashHafalanBaru')}</h3>
+    <section class="dash-section">
+      <h3 class="section-title">${icon('book')} ${t('dashHafalanBaru')}</h3>
       <div class="dash-card"><p class="muted" style="margin:0;">${t('dashQuranFullyDone')}</p></div>
-    </div>`;
+    </section>`;
   }
   const surah = getSurah(sug.surah);
   const st = getSurahStatus(sug.surah);
   const fillPct = Math.round(((st.memorisedUpTo||0)/surah.totalAyah)*100);
   return `
-  <div class="dash-section">
-    <h3>${t('dashHafalanBaru')}</h3>
+  <section class="dash-section">
+    <h3 class="section-title">${icon('book')} ${t('dashHafalanBaru')}</h3>
     <div class="dash-card">
-      <div class="stat-row" style="margin-top:0;"><span>${t('dashStartingPoint')}</span><strong>${positionPointerLabel()}</strong></div>
+      <div class="stat-row"><span>${t('dashStartingPoint')}</span><strong>${positionPointerLabel()}</strong></div>
       <div class="bar-track"><div class="bar-fill gold" style="width:${fillPct}%;"></div></div>
       <div class="stat-row"><span>${t('dashProgressIn',{surah:escapeHtml(surah.name)})}</span><strong>${t('dashProgressInVal',{done:st.memorisedUpTo||0, total:surah.totalAyah})}</strong></div>
       <div class="stat-row"><span>${t('dashDailyTargetPace')}</span><strong>${paceLabel}</strong></div>
     </div>
-  </div>`;
+  </section>`;
 }
 
 function weeklyPlanDashHtml(){
@@ -1427,51 +1729,65 @@ function weeklyPlanDashHtml(){
   const active = new Set(p.activeDays||[]);
   const cells = WEEKDAYS.map(d => {
     const isActive = active.has(d.key);
-    return `<div class="day-card ${isActive?'active':''}" data-day-detail="${d.key}">
-      <div class="dname">${t(d.shortKey)}</div>
-      <div class="ddot">${isActive ? '&#9679;' : '&mdash;'}</div>
-    </div>`;
+    return `<button type="button" class="day-card ${isActive?'active':''}" data-day-detail="${d.key}" aria-label="${t(d.labelKey)}" aria-pressed="${isActive}">
+      <span class="dname">${t(d.shortKey)}</span>
+      <span class="dbox">${isActive ? icon('check') : ''}</span>
+    </button>`;
   }).join('');
   return `
-  <div class="dash-section">
-    <h3>${t('dashWeeklyPlan')}</h3>
+  <section class="dash-section">
+    <h3 class="section-title">${icon('calendar')} ${t('dashWeeklyPlan')}</h3>
     <div class="dash-card">
       <div class="week-grid">${cells}</div>
-      <p class="muted" style="margin:10px 0 0;">${t('dashWeeklyPlanHint')}</p>
-      <button class="btn btn-secondary btn-block" style="margin-top:14px;" data-action="calendar-choice">${t('dashAddToCalendar')}</button>
+      <p class="week-hint">${t('dashWeeklyPlanHint')}</p>
     </div>
-  </div>`;
+  </section>`;
 }
 
 function rancangHtml(){
+  const p = PROGRESS.plan;
+  const juzCount = memorisedJuzList().length;
+  const dailyMurajaah = juzPerDayForCycle(juzCount, p.murajaahCycleDays);
   return `
-  <h2>${t('rancangTitle')}</h2>
-  ${hifzProgressDashHtml()}
-  ${murajaahCycleDashHtml()}
-  ${hafalanBaruDashHtml()}
-  ${weeklyPlanDashHtml()}
-  <button class="btn btn-primary btn-block" data-action="edit-plan">${t('editPlan')}</button>
+  ${pageHeadHtml('calendar', t('rancangTitle'), t('rancangDesc'))}
+  <div class="plan-summary">
+    <div>${icon('book')}<div class="ps-label">${t('recHafalanBaru')}</div><div class="ps-val">${calPaceLabel(p.paceTarget)}<br>${t('recPerWeek',{n:p.hafalanDaysPerWeek})}</div></div>
+    <div>${icon('refresh')}<div class="ps-label">${t('recMurajaah')}</div><div class="ps-val">${juzCount>0 ? t('recJuzPerDay',{n:dailyMurajaah}) : '&mdash;'}</div></div>
+    <div>${icon('clock')}<div class="ps-label">${t('rancangSummaryCycle')}</div><div class="ps-val">${t('recPerCycle',{n:p.murajaahCycleDays})}</div></div>
+  </div>
+  <div class="rancang-grid">
+    ${hifzProgressDashHtml()}
+    ${murajaahCycleDashHtml()}
+    ${hafalanBaruDashHtml()}
+    ${weeklyPlanDashHtml()}
+    <div class="settings-list span-2">
+      <button type="button" class="settings-row" data-action="edit-plan">${icon('sliders')}<span><span class="sr-title">${t('planSettings')}</span><span class="sr-sub">${t('planSettingsHint')}</span></span><span class="sr-chev">${icon('chevron','icon-sm')}</span></button>
+      <button type="button" class="settings-row" data-action="calendar-choice">${icon('calendarPlus')}<span><span class="sr-title">${t('calendarIntegration')}</span><span class="sr-sub">${t('calendarIntegrationHint')}</span></span><span class="sr-chev">${icon('chevron','icon-sm')}</span></button>
+    </div>
+  </div>
   `;
 }
 
 // ===================== PETA HIFZ =====================
 function petaHifzHtml(){
+  const counts = { memorised:0, in_progress:0, not_started:0, needs_attention:0 };
   const cells = SURAHS.map(s => {
     const state = surahCellState(s.no);
+    counts[state]++;
     const badges = juzBadgesForSurah(s.no);
-    return `<div class="surah-cell ${state}" data-surah-detail="${s.no}">
+    return `<button type="button" class="surah-cell ${state}" data-surah-detail="${s.no}" title="${escapeHtml(s.name)}" aria-label="${s.no}. ${escapeHtml(s.name)}">
       ${badges.length ? `<span class="juz-badge">J${badges[0]}</span>` : ''}
-      <div class="cno">${s.no}</div>
-    </div>`;
+      <span class="cno">${s.no}</span>
+    </button>`;
   }).join('');
+  const legendItem = (bg, border, label, n) => `<span><span class="legend-dot" style="background:${bg};border-color:${border};"></span>${label}<span class="count">${n}</span></span>`;
   return `
-  <h2>${t('petaTitle')}</h2>
-  <p class="muted">${t('petaDesc')}</p>
+  ${pageHeadHtml('grid', t('petaTitle'), t('petaDesc'))}
   <div class="legend">
-    <span><span class="legend-dot" style="background:var(--ivory);border:1px solid var(--border-beige);"></span>${t('legendNotStarted')}</span>
-    <span><span class="legend-dot" style="background:var(--soft-gold);"></span>${t('legendInProgress')}</span>
-    <span><span class="legend-dot" style="background:var(--deep-green);"></span>${t('legendMemorised')}</span>
-    <span><span class="legend-dot" style="background:var(--amber);"></span>${t('legendNeedsAttention')}</span>
+    ${legendItem('var(--green)','var(--green)', t('legendMemorised'), counts.memorised)}
+    ${legendItem('var(--gold)','var(--gold)', t('legendInProgress'), counts.in_progress)}
+    ${legendItem('var(--sand-soft)','var(--line-strong)', t('legendNotStarted'), counts.not_started)}
+    ${legendItem('var(--attn)','var(--attn)', t('legendNeedsAttention'), counts.needs_attention)}
   </div>
   <div class="hifz-grid">${cells}</div>
   `;
@@ -1484,27 +1800,44 @@ function riwayatHtml(){
     .filter(e => STATE.riwayatFilter==='all' || e.type===STATE.riwayatFilter)
     .slice().sort((a,b) => b.date.localeCompare(a.date) || (b.id>a.id?1:-1));
 
-  const rows = filtered.map(e => {
-    const mainLabel = e.type==='new'
-      ? `<strong>${escapeHtml(getSurah(e.surah)?.name||('Surah '+e.surah))}</strong> ${t('riwayatAyahRange',{from:e.ayahFrom, to:e.ayahTo})}`
-      : `<strong>${t('riwayatJuz',{n:e.juz})}</strong>`;
+  const rowHtml = e => {
+    const detail = e.type==='new'
+      ? `${escapeHtml(getSurah(e.surah)?.name||('Surah '+e.surah))} &middot; ${t('riwayatAyahRange',{from:e.ayahFrom, to:e.ayahTo})}`
+      : t('riwayatJuz',{n:e.juz});
+    const ratingLabel = e.rating ? t(RATING_LABEL_KEYS[e.rating]||'') : '';
     return `
-    <div class="entry-row">
+    <li class="entry-row">
+      <div class="entry-date">${shortDateLabel(e.date)}</div>
+      <div class="entry-type-icon">${icon(e.type==='new'?'book':'refresh')}</div>
       <div class="entry-main">
-        <div class="entry-date">${e.date}</div>
-        <div>${mainLabel} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating]||'')}</span></div>
-        ${e.note ? `<div class="muted">${escapeHtml(e.note)}</div>` : ''}
+        <div class="entry-title">${e.type==='new'?t('entryTypeNew'):t('entryTypeMurajaah')}</div>
+        <div class="entry-detail">${detail}</div>
+        ${e.note ? `<div class="entry-note">${escapeHtml(e.note)}</div>` : ''}
       </div>
-      <div class="type-badge ${e.type}">${e.type==='new'?t('entryTypeNew'):t('entryTypeMurajaah')}</div>
-    </div>`;
-  }).join('');
+      ${ratingLabel ? `<span class="rating-tag ${e.rating}">${ratingLabel}</span>` : '<span></span>'}
+    </li>`;
+  };
+
+  // Group (already date-sorted) entries by calendar month for scanning.
+  const groups = [];
+  filtered.forEach(e => {
+    const key = e.date.slice(0,7);
+    if(!groups.length || groups[groups.length-1].key !== key) groups.push({ key, items: [] });
+    groups[groups.length-1].items.push(e);
+  });
 
   return `
-  <h2>${t('riwayatTitle')}</h2>
+  ${pageHeadHtml('clock', t('riwayatTitle'), t('riwayatDesc'))}
   <div class="filter-row">
-    ${filters.map(f => `<div class="choice ${STATE.riwayatFilter===f.key?'selected':''}" data-set-filter="${f.key}">${t(f.labelKey)}</div>`).join('')}
+    ${filters.map(f => `<div class="choice ${STATE.riwayatFilter===f.key?'selected':''}" data-set-filter="${f.key}" role="button" tabindex="0">${t(f.labelKey)}</div>`).join('')}
   </div>
-  ${filtered.length ? `<div class="card">${rows}</div>` : `<div class="empty-state">${t('riwayatEmpty')}</div>`}
+  ${filtered.length
+    ? `<div class="card">${groups.map(g => `
+        <div class="month-group">
+          <div class="month-label">${monthLabel(g.items[0].date)}</div>
+          <ul class="timeline">${g.items.map(rowHtml).join('')}</ul>
+        </div>`).join('')}</div>`
+    : `<div class="empty-state">${icon('clock')}<div>${t('riwayatEmpty')}</div></div>`}
   `;
 }
 
@@ -1535,8 +1868,8 @@ function logNewModalHtml(){
   const surah = getSurah(surahNo);
   return `
   <div class="modal-overlay" data-close-modal="1">
-    <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${t('modalLogNewTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+    <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+      <div class="modal-header"><h3 style="margin:0;">${t('modalLogNewTitle')}</h3>${closeBtnHtml()}</div>
       <div class="field"><label>${t('fieldSurah')}</label><select id="logSurahSelect" data-modal-field="surah">${surahSelectOptions(surahNo)}</select></div>
       <div class="row2">
         <div class="field"><label>${t('fieldAyahFrom')}</label><input type="number" min="1" max="${surah.totalAyah}" id="logAyahFrom" data-modal-field="ayahFrom" value="${ayahFrom}"></div>
@@ -1557,8 +1890,8 @@ function logMurajaahModalHtml(){
   const juzNo = (m.juz !== undefined) ? m.juz : m.prefill.juz;
   return `
   <div class="modal-overlay" data-close-modal="1">
-    <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${t('modalLogMurajaahTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+    <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+      <div class="modal-header"><h3 style="margin:0;">${t('modalLogMurajaahTitle')}</h3>${closeBtnHtml()}</div>
       <div class="field"><label>${t('fieldJuzuk')}</label><select id="logJuzSelect" data-modal-field="juz">${juzSelectOptions(juzNo, juzList)}</select></div>
       <div class="field"><label>${t('fieldQuality')}</label>
         <div class="rating-group">${RATINGS.map(r => `<div class="rating-choice ${r} ${m.rating===r?'selected '+r:''}" data-set-rating="${r}">${t(RATING_LABEL_KEYS[r])}</div>`).join('')}</div>
@@ -1574,8 +1907,8 @@ function calendarChoiceModalHtml(){
   if(!hafalanResult.ok){
     return `
     <div class="modal-overlay" data-close-modal="1">
-      <div class="modal-sheet" data-stop-propagation="1">
-        <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+      <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+        <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3>${closeBtnHtml()}</div>
         <p class="muted">${escapeHtml(hafalanResult.reason)}</p>
       </div>
     </div>`;
@@ -1583,16 +1916,18 @@ function calendarChoiceModalHtml(){
   const murajaahResult = buildGoogleCalendarUrl('murajaah');
   return `
   <div class="modal-overlay" data-close-modal="1">
-    <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+    <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+      <div class="modal-header"><h3 style="margin:0;">${t('modalCalendarTitle')}</h3>${closeBtnHtml()}</div>
       <p class="muted">${t('calendarChooseOne')}</p>
-      <div class="due-card" style="margin-top:14px;cursor:pointer;" data-open-gcal="hafalan">
-        <div class="dctitle">&#127793; ${escapeHtml(hafalanResult.title)}</div>
-        <div class="dcbody muted">${t('calendarOpenNewTab')}</div>
+      <div class="option-card" data-open-gcal="hafalan" role="button" tabindex="0">
+        <span class="oc-icon">${icon('book')}</span>
+        <div><div class="oc-title">${hafalanResult.title}</div><div class="oc-sub">${t('calendarOpenNewTab')}</div></div>
+        <span class="oc-chev">${icon('chevron','icon-sm')}</span>
       </div>
-      <div class="due-card" data-open-gcal="murajaah" style="cursor:pointer;">
-        <div class="dctitle">&#128260; ${escapeHtml(murajaahResult.title)}</div>
-        <div class="dcbody muted">${t('calendarOpenNewTab')}</div>
+      <div class="option-card" data-open-gcal="murajaah" role="button" tabindex="0">
+        <span class="oc-icon">${icon('refresh')}</span>
+        <div><div class="oc-title">${murajaahResult.title}</div><div class="oc-sub">${t('calendarOpenNewTab')}</div></div>
+        <span class="oc-chev">${icon('chevron','icon-sm')}</span>
       </div>
     </div>
   </div>`;
@@ -1610,12 +1945,12 @@ function dayDetailModalHtml(){
 
   return `
   <div class="modal-overlay" data-close-modal="1">
-    <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${t(day.labelKey)}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
+    <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+      <div class="modal-header"><h3 style="margin:0;">${t(day.labelKey)}</h3>${closeBtnHtml()}</div>
       ${!isActive ? `<p class="muted">${t('dayDetailInactive')}</p>` : `
-      <div class="detail-row"><span class="muted">${t('dayDetailHafalanBaru')}</span><span>${paceLabel}</span></div>
-      <div class="detail-row"><span class="muted">${t('dayDetailMurajaah')}</span><span>${juzCount>0 ? t('dashDailyTargetVal',{n:dailyMurajaahTarget}) : '&mdash;'}</span></div>
-      <div class="detail-row"><span class="muted">${t('dayDetailMasa')}</span><span>${timeLabel}</span></div>
+      <div class="detail-row"><span class="dr-label">${icon('book')} ${t('dayDetailHafalanBaru')}</span><span>${paceLabel}</span></div>
+      <div class="detail-row"><span class="dr-label">${icon('refresh')} ${t('dayDetailMurajaah')}</span><span>${juzCount>0 ? t('dashDailyTargetVal',{n:dailyMurajaahTarget}) : '&mdash;'}</span></div>
+      <div class="detail-row"><span class="dr-label">${icon('clock')} ${t('dayDetailMasa')}</span><span>${timeLabel}</span></div>
       `}
     </div>
   </div>`;
@@ -1632,19 +1967,21 @@ function surahDetailModalHtml(){
 
   return `
   <div class="modal-overlay" data-close-modal="1">
-    <div class="modal-sheet" data-stop-propagation="1">
-      <div class="modal-header"><h3 style="margin:0;">${escapeHtml(s.name)}</h3><button class="modal-close" data-action="close-modal">&times;</button></div>
-      <div class="detail-row"><span class="muted">${t('surahDetailTotalAyah')}</span><span>${s.totalAyah}</span></div>
-      <div class="detail-row"><span class="muted">${t('surahDetailStatus')}</span><span>${statusLabel}</span></div>
-      <div class="detail-row"><span class="muted">${t('surahDetailMemorisedUpTo')}</span><span>${st.memorisedUpTo||0}</span></div>
-      <div class="detail-row"><span class="muted">${t('surahDetailLastQuality')}</span><span>${st.lastRating?t(RATING_LABEL_KEYS[st.lastRating]):'&mdash;'}</span></div>
-      <div class="detail-row"><span class="muted">${t('surahDetailLastDate')}</span><span>${st.lastRevisedDate||'&mdash;'}</span></div>
+    <div class="modal-sheet" data-stop-propagation="1" role="dialog" aria-modal="true">
+      <div class="modal-header"><h3 style="margin:0;">${escapeHtml(s.name)}</h3>${closeBtnHtml()}</div>
+      <div class="detail-row"><span class="dr-label">${t('surahDetailTotalAyah')}</span><span>${s.totalAyah}</span></div>
+      <div class="detail-row"><span class="dr-label">${t('surahDetailStatus')}</span><span>${statusLabel}</span></div>
+      <div class="detail-row"><span class="dr-label">${t('surahDetailMemorisedUpTo')}</span><span>${st.memorisedUpTo||0}</span></div>
+      <div class="detail-row"><span class="dr-label">${t('surahDetailLastQuality')}</span><span>${st.lastRating?`<span class="rating-tag ${st.lastRating}">${t(RATING_LABEL_KEYS[st.lastRating])}</span>`:'&mdash;'}</span></div>
+      <div class="detail-row"><span class="dr-label">${t('surahDetailLastDate')}</span><span>${st.lastRevisedDate||'&mdash;'}</span></div>
       ${history.length ? `
-      <h3 style="font-size:14px;margin-top:16px;">${t('surahDetailHistory')}</h3>
+      <h3 class="section-title" style="font-size:16px;margin-top:20px;">${icon('clock')} ${t('surahDetailHistory')}</h3>
+      <div class="history-mini">
       ${history.map(e => e.type==='new'
         ? `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>${t('surahDetailAyahRange',{from:e.ayahFrom, to:e.ayahTo})} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating])}</span></div><div class="type-badge new">${t('entryTypeNew')}</div></div>`
         : `<div class="entry-row"><div class="entry-main"><div class="entry-date">${e.date}</div>${t('surahDetailMurajaahJuz',{n:e.juz})} <span class="rating-tag ${e.rating}">${t(RATING_LABEL_KEYS[e.rating])}</span></div><div class="type-badge murajaah">${t('entryTypeMurajaah')}</div></div>`
       ).join('')}
+      </div>
       ` : `<p class="muted" style="margin-top:14px;">${t('surahDetailNoHistory')}</p>`}
     </div>
   </div>`;
