@@ -7,7 +7,7 @@ share one design system.
 |---|---|---|
 | 01 · Mutashabihat Ebook | `Batch01-EbookShowcase` (26.9 s / 806 f) | Review (v2) |
 | 02 · Mutasyabihat Challenge | `Batch02-MutasyabihatChallenge` (30.0 s / 900 f) | Review |
-| 03 · Hifz Companion | — | not started |
+| 03 · Hifz Companion | `Batch03-HifzCompanion` (22.5 s / 675 f) | Review |
 | 04 · Hifz Timeline | — | not started |
 
 `HifzLab-FullPromo` plays every registered batch back to back.
@@ -137,6 +137,15 @@ regions in `src/data/challenge.ts`. Every interface element is a crop of a
 supplied screenshot (`ScreenPanel`); highlights, the selection ring, value
 wipes and the progress-bar reveal are overlays or masks over those pixels.
 Asset notes: `docs/batch02-asset-manifest.md`.
+
+## Batch 03 — Hifz Companion
+
+Vertical 1080×1920 teaser, 22.5 s, five scenes in `src/scenes/companion/`
+(Beginning, DailyCompanion, Routine, ProgressOverTime, CompanionReveal);
+timing in `src/compositions/companion.timeline.ts`, regions and sampled app
+colours in `src/data/companion.ts`. Shows selected moments only. New reusable
+pieces: `RingReveal` (animates a ring that exists in a screenshot by
+retracting a cover arc) and `CalendarMotif` (abstract day grid, no dates).
 
 ## Adding the next batch
 

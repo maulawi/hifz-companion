@@ -2,6 +2,8 @@ import React from 'react';
 import {FormatId} from '../styles/brand';
 import {MutasyabihatChallenge} from './MutasyabihatChallenge';
 import {CHALLENGE_DURATION} from './challenge.timeline';
+import {HifzCompanion} from './HifzCompanion';
+import {COMPANION_DURATION} from './companion.timeline';
 import {EbookShowcase, ebookShowcaseDefaults} from './EbookShowcase';
 import {EBOOK_SHOWCASE_DURATION} from './ebookShowcase.timeline';
 
@@ -38,6 +40,12 @@ export const BATCHES: Batch[] = [
     // Vertical master to match the rest of the series (a landscape cut can be added later).
     format: 'vertical',
   },
-  // { id: 'Batch03-HifzCompanion', ... },
+  {
+    id: 'Batch03-HifzCompanion',
+    title: 'Hifz Companion',
+    component: HifzCompanion,
+    durationInFrames: COMPANION_DURATION,
+    format: 'vertical',
+  },
   // { id: 'Batch04-HifzTimeline', ... },
 ];
