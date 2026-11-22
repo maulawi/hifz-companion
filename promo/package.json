@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "render:full-promo": "remotion render HifzLab-FullPromo out/hifz-lab-full-promo.mp4 --codec=h264 --crf=18",
     "render:b02-preview": "remotion render Batch02-MutasyabihatChallenge out/batch02-preview.mp4 --scale=0.75 --crf=23",
-    "render:b02-final": "remotion render Batch02-MutasyabihatChallenge out/batch02-final.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow"
+    "render:b02-final": "remotion render Batch02-MutasyabihatChallenge out/batch02-final.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow",
+    "render:b03-preview": "remotion render Batch03-HifzCompanion out/batch03-preview.mp4 --scale=0.75 --crf=23",
+    "render:b03-final": "remotion render Batch03-HifzCompanion out/batch03-final.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow"
   },
   "dependencies": {
     "@fontsource/inter": "5.3.0",
