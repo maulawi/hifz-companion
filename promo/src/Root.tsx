@@ -51,7 +51,7 @@ export const RemotionRoot: React.FC = () => (
       fps={canvas.fps}
       width={canvas.width}
       height={canvas.height}
-      defaultProps={{timelineVo: false, music: true, sfx: true, voiceover: true}}
+      defaultProps={{music: true, sfx: true, voiceover: true}}
     />
   </>
 );

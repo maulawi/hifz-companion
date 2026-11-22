@@ -40,29 +40,31 @@ export const at = (id: PartId, local: number): number | null => {
 };
 
 // ───────────────────────── Voice-over ─────────────────────────
-/** Narration clips (cut from the supplied ElevenLabs read at its natural pauses). */
-export const VO = [
-  {id: 'vo-01-intro', src: 'audio/vo/vo-01-intro.wav', frame: 8}, // "Introducing Hifz Lab…"
-  {id: 'vo-02-ebook', src: 'audio/vo/vo-02-ebook.wav', frame: (at('b01', 140) ?? 0)}, // book rising
-  {id: 'vo-03-challenge', src: 'audio/vo/vo-03-challenge.wav', frame: (at('b02', 60) ?? 0)}, // icon in flight
-  {id: 'vo-04-companion', src: 'audio/vo/vo-04-companion.wav', frame: (at('b03', 19) ?? 0)}, // icon rises
-  {id: 'vo-05-finale', src: 'audio/vo/vo-05-finale.wav', frame: PART_START.finale + 15}, // "Four tools, one purpose…"
-] as const;
-
-/** Durations (s) of the VO clips, used for music ducking. */
-export const VO_SECONDS: Record<string, number> = {
-  'vo-01-intro': 5.55,
-  'vo-02-ebook': 7.53,
-  'vo-03-challenge': 6.85,
-  'vo-04-companion': 6.4,
-  'vo-05-finale': 9.0,
-};
-
 /**
- * Optional Hifz Timeline line (not in the supplied read). Put a recording at
- * this path and set `timelineVo` on the composition to play it on the icon.
+ * Narration clips, cut at the natural pauses of the two supplied ElevenLabs
+ * reads: the product lines (vo-*) and the scene headlines (h*). Each is anchored
+ * to a frame of its own part, so it follows the picture if timings change.
  */
-export const TIMELINE_VO_SLOT = {src: 'audio/vo/vo-04b-timeline.wav', frame: at('b04', 20) ?? 0};
+const vo = (id: string, part: PartId, local: number, seconds: number) => ({id, src: `audio/vo/${id}.wav`, frame: at(part, local) ?? 0, seconds});
+
+export const VO = [
+  vo('vo-01-intro', 'opener', 8, 5.55), // "Introducing Hifz Lab…"
+  vo('vo-02-ebook', 'b01', 140, 7.53), // book rising
+  vo('h00-origin', 'b01', 385, 3.15), // "Rooted in the classical work of Imam al-Sakhawi" — over the page turns
+  vo('vo-03-challenge', 'b02', 60, 6.85), // icon in flight
+  vo('h0a-recall', 'b02', 285, 1.91), // "Can you recall the correct ayah?"
+  vo('h0b-differences', 'b02', 440, 4.86), // "Recognise the differences…"
+  vo('h0c-progress', 'b02', 648, 1.44), // "Measure your progress."
+  vo('vo-04-companion', 'b03', 19, 6.4), // icon rises
+  vo('h0d-rhythm', 'b03', 257, 1.98), // "Find a rhythm that works for you."
+  vo('h0e-small-steps', 'b03', 403, 1.99), // "Every small step matters."
+  vo('h0f1-timeline', 'b04', 14, 2.37), // "And finally, Hifz Timeline."
+  vo('h0f2-how-long', 'b04', 100, 1.76), // "How long will your journey take?"
+  vo('h0g-capacity', 'b04', 165, 1.95), // "Start with your daily capacity."
+  vo('h0h-long-term', 'b04', 255, 3.1), // "Turn your daily target into a long-term plan."
+  vo('h0i-clearer', 'b04', 420, 2.53), // "A clearer picture of your Hifz journey."
+  {id: 'vo-05-finale', src: 'audio/vo/vo-05-finale.wav', frame: PART_START.finale + 15, seconds: 9.0}, // "Four tools, one purpose…"
+];
 
 // ───────────────────────── Sound design ─────────────────────────
 type Sfx =

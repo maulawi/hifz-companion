@@ -10,7 +10,7 @@ import {HifzCompanion} from './HifzCompanion';
 import {HifzTimeline} from './HifzTimeline';
 import {Opener} from '../scenes/compiled/Opener';
 import {Finale} from '../scenes/compiled/Finale';
-import {COMPILED_DURATION, JOIN, MUSIC, PARTS, PartId, SFX_CUES, TIMELINE_VO_SLOT, VO, VO_SECONDS} from './compiled.timeline';
+import {COMPILED_DURATION, JOIN, MUSIC, PARTS, PartId, SFX_CUES, VO} from './compiled.timeline';
 
 const PART_COMPONENTS: Record<PartId, React.FC> = {
   opener: Opener,
@@ -22,8 +22,6 @@ const PART_COMPONENTS: Record<PartId, React.FC> = {
 };
 
 export type CompiledProps = {
-  /** Play the optional Hifz Timeline narration from TIMELINE_VO_SLOT.src. */
-  timelineVo?: boolean;
   /** Mute layers for review. */
   music?: boolean;
   sfx?: boolean;
@@ -31,9 +29,8 @@ export type CompiledProps = {
 };
 
 /** Music level with ducking under each narration line. */
-const musicVolume = (f: number, fps: number, withTimeline: boolean) => {
-  const windows = VO.map((v) => [v.frame, v.frame + VO_SECONDS[v.id] * fps] as const);
-  if (withTimeline) windows.push([TIMELINE_VO_SLOT.frame, TIMELINE_VO_SLOT.frame + 5 * fps]);
+const musicVolume = (f: number, fps: number) => {
+  const windows = VO.map((v) => [v.frame, v.frame + v.seconds * fps] as const);
   let duck = 0;
   for (const [a, b] of windows) {
     duck = Math.max(duck, interpolate(f, [a - MUSIC.rampFrames, a, b, b + MUSIC.rampFrames], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}));
@@ -46,7 +43,7 @@ const musicVolume = (f: number, fps: number, withTimeline: boolean) => {
  * HifzLab-Compiled — opener, the four approved batches (trimmed so only one
  * ending remains), and the finale, with narration, music bed and sound design.
  */
-export const HifzLabCompiled: React.FC<CompiledProps> = ({timelineVo = false, music = true, sfx = true, voiceover = true}) => (
+export const HifzLabCompiled: React.FC<CompiledProps> = ({music = true, sfx = true, voiceover = true}) => (
   <AbsoluteFill>
     <BrandBackground />
     <TransitionSeries>
@@ -66,19 +63,14 @@ export const HifzLabCompiled: React.FC<CompiledProps> = ({timelineVo = false, mu
     </TransitionSeries>
 
     {/* ── Sound ── */}
-    {music ? <Audio src={staticFile(MUSIC.src)} volume={(f) => musicVolume(f, 30, timelineVo)} /> : null}
+    {music ? <Audio src={staticFile(MUSIC.src)} volume={(f) => musicVolume(f, 30)} /> : null}
     {voiceover
       ? VO.map((v) => (
-          <Sequence key={v.id} from={v.frame} name={`VO ${v.id}`}>
+          <Sequence key={v.id} from={v.frame} durationInFrames={Math.ceil(v.seconds * 30) + 6} name={`VO ${v.id}`}>
             <Audio src={staticFile(v.src)} volume={1} />
           </Sequence>
         ))
       : null}
-    {voiceover && timelineVo ? (
-      <Sequence from={TIMELINE_VO_SLOT.frame} name="VO timeline (optional)">
-        <Audio src={staticFile(TIMELINE_VO_SLOT.src)} volume={1} />
-      </Sequence>
-    ) : null}
     {sfx
       ? SFX_CUES.map((c, i) => (
           <Sequence key={i} from={c.frame} durationInFrames={150} name={`sfx ${c.sfx}`}>
