@@ -326,6 +326,8 @@ export const MK_TAKES = {
   headRotate: {src: 'makhraj/video/3d-head-rotate.mp4', frames: 210},
   point5Intro: {src: 'makhraj/video/3d-point5-intro.mp4', frames: 77},
   point5Orbit: {src: 'makhraj/video/3d-point5-orbit.mp4', frames: 218},
+  /** Same take slowed to 0.62× with motion-interpolated frames (smooth, no repeated frames). */
+  point5OrbitSlow: {src: 'makhraj/video/3d-point5-orbit-slow.mp4', frames: 349},
 } as const;
 export const TAKE_ASPECT = 1260 / 768;
 

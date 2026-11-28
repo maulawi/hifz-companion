@@ -283,8 +283,10 @@ export const SceneExperience: React.FC = () => {
   const gather = progress(frame, 1464, 44, ease.out);
   const drift = progress(frame, 1464, 340, ease.soft);
 
-  // Which panel leads for each word
-  const lead = frame >= CUE.refining - 4 ? 2 : frame >= CUE.understanding - 4 ? 1 : frame >= CUE.seeing - 4 ? 0 : -1;
+  // Focus weights move continuously from panel to panel (no jumps when the lead changes)
+  const into = (k: number) => progress(frame, [CUE.seeing, CUE.understanding, CUE.refining][k] - 4, 18, ease.inOut);
+  const anyLead = into(0);
+  const weight = (i: number) => into(i) - (i < 2 ? into(i + 1) : 0);
   const panels: Array<{screen: keyof typeof MK_SCREENS; crop?: Rect; w: [number, number]; pos: [[number, number], [number, number]]}> = [
     {screen: 'jaw', w: [560, 420], pos: [[-560, -20], [-270, 0]]},
     {screen: 'waw', crop: union(R.waw.header, R.waw.intro), w: [460, 600], pos: [[0, 10], [0, 0]]},
@@ -302,22 +304,28 @@ export const SceneExperience: React.FC = () => {
       <AbsoluteFill style={{transform: `scale(${1.04 - drift * 0.04})`}}>
         {panels.map((p, i) => {
           const [dx, dy] = p.pos[L.landscape ? 0 : 1];
-          const focus = lead === -1 ? 0 : lead === i ? 1 : -1;
-          const f = progress(frame, lead === -1 ? 99999 : words[lead].at - 4, 16, ease.inOut);
+          const fw = weight(i); // 0…1 this panel leads
+          const dim = Math.max(0, anyLead - fw); // 0…1 another panel leads
+          const toward = L.landscape ? 1 : 1 - 0.75 * fw;
+          const x = L.cx + dx * mix(1.4, 1, gather) * toward + float(frame, 5, 220, i);
+          const y = cy + dy + float(frame, 5, 200, i + 2);
+          const scale = 1 + 0.1 * fw - 0.06 * dim;
+          const opacity = gather * (1 - 0.45 * dim);
+          const zIndex = fw > 0.5 ? 3 : 1;
           const w = p.w[L.landscape ? 0 : 1];
           if (p.screen === 'jaw') {
             return (
               <VideoPanel
                 key={i}
-                take="point5Orbit"
+                take="point5OrbitSlow"
                 from={1464}
-                playbackRate={0.7}
+                tilt={2.5}
                 width={L.landscape ? 380 : 420}
-                x={L.cx + dx * mix(1.4, 1, gather) * (focus === 1 && !L.landscape ? 1 - 0.75 * f : 1) + float(frame, 6, 160, i)}
-                y={cy + dy + float(frame, 6, 140, i + 2)}
-                scale={1 + (focus === 1 ? 0.1 * f : focus === -1 ? -0.06 * f : 0)}
-                opacity={gather * (focus === -1 ? 1 - 0.45 * f : 1)}
-                zIndex={focus === 1 ? 3 : 1}
+                x={x}
+                y={y}
+                scale={scale}
+                opacity={opacity}
+                zIndex={zIndex}
               />
             );
           }
@@ -327,16 +335,16 @@ export const SceneExperience: React.FC = () => {
               screen={MK_SCREENS[p.screen]}
               crop={p.crop}
               width={w}
-              x={L.cx + dx * mix(1.4, 1, gather) * (focus === 1 && !L.landscape ? 1 - 0.75 * f : 1) + float(frame, 6, 160, i)}
-              y={cy + dy + float(frame, 6, 140, i + 2)}
-              scale={1 + (focus === 1 ? 0.1 * f : focus === -1 ? -0.06 * f : 0)}
-              opacity={gather * (focus === -1 ? 1 - 0.45 * f : 1)}
-              blur={focus === -1 ? 2.5 * f : 0}
-              rotateY={L.landscape ? (i - 1) * -8 * (1 - (focus === 1 ? f : 0)) : 0}
+              x={x}
+              y={y}
+              scale={scale}
+              opacity={opacity}
+              blur={2.5 * dim}
+              rotateY={L.landscape ? (i - 1) * -8 * (1 - fw) : 0}
               radius={26}
               shadow={0}
               edge={0}
-              style={{...DARK_PANEL, zIndex: focus === 1 ? 3 : 1}}
+              style={{...DARK_PANEL, zIndex}}
             />
           );
         })}
@@ -346,7 +354,7 @@ export const SceneExperience: React.FC = () => {
       </div>
       {words.map((w, i) => (
         <div key={w.t} style={{position: 'absolute', left: 0, right: 0, top: L.landscape ? L.h - 210 : 1400}}>
-          <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 78 : 82} duration={20} exitStart={i < 2 ? words[i + 1].at - 6 : 1782} />
+          <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 78 : 82} duration={20} exitStart={i < 2 ? words[i + 1].at - 20 : 1782} />
         </div>
       ))}
     </AbsoluteFill>

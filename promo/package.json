@@ -2,7 +2,7 @@
   "name": "qurra-hifz-lab-promo",
   "version": "1.0.0",
   "private": true,
-  "description": "QURRA / Hifz Lab promotional video — Remotion project",
+  "description": "QURRA / Hifz Lab promotional video \u2014 Remotion project",
   "scripts": {
     "studio": "remotion studio",
     "still": "remotion still",
@@ -18,7 +18,9 @@
     "render:b04-final": "remotion render Batch04-HifzTimeline out/batch04-final.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow",
     "render:compiled-preview": "remotion render HifzLab-Compiled out/hifzlab-compiled-raw.mp4 --scale=0.75 --crf=23 && tools/master_audio.sh out/hifzlab-compiled-raw.mp4 out/hifzlab-compiled-preview.mp4",
     "render:compiled-final": "remotion render HifzLab-Compiled out/hifzlab-compiled-raw.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow --audio-bitrate=320k && tools/master_audio.sh out/hifzlab-compiled-raw.mp4 out/hifzlab-compiled-final.mp4",
-    "sfx": "python3 tools/sfx_synth.py public/audio"
+    "sfx": "python3 tools/sfx_synth.py public/audio",
+    "render:makhraj-landscape-final": "remotion render MakhrajLab-Landscape out/makhraj-lab-landscape-raw.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow --audio-bitrate=320k && bash tools/master_audio.sh out/makhraj-lab-landscape-raw.mp4 out/makhraj-lab-landscape-final.mp4",
+    "render:makhraj-vertical-final": "remotion render MakhrajLab-Vertical out/makhraj-lab-vertical-raw.mp4 --codec=h264 --crf=15 --image-format=png --pixel-format=yuv420p --color-space=bt709 --x264-preset=slow --audio-bitrate=320k && bash tools/master_audio.sh out/makhraj-lab-vertical-raw.mp4 out/makhraj-lab-vertical-final.mp4"
   },
   "dependencies": {
     "@fontsource/amiri": "5.2.8",
