@@ -2,6 +2,8 @@ import React from 'react';
 import {Composition, Series} from 'remotion';
 import {BATCHES} from './compositions/batches';
 import {HifzLabCompiled} from './compositions/HifzLabCompiled';
+import {MakhrajLab} from './makhraj/MakhrajLab';
+import {MAKHRAJ_DURATION} from './makhraj/theme';
 import {COMPILED_DURATION} from './compositions/compiled.timeline';
 import {canvas, formats} from './styles/brand';
 import {loadBrandFonts} from './styles/fonts';
@@ -53,5 +55,8 @@ export const RemotionRoot: React.FC = () => (
       height={canvas.height}
       defaultProps={{music: true, sfx: true, voiceover: true}}
     />
+    {/* Makhraj Lab launch film — one composition, two formats */}
+    <Composition id="MakhrajLab-Landscape" component={MakhrajLab} durationInFrames={MAKHRAJ_DURATION} fps={30} width={1920} height={1080} defaultProps={{url: '', music: true, sfx: true, voiceover: true}} />
+    <Composition id="MakhrajLab-Vertical" component={MakhrajLab} durationInFrames={MAKHRAJ_DURATION} fps={30} width={1080} height={1920} defaultProps={{url: '', music: true, sfx: true, voiceover: true}} />
   </>
 );
