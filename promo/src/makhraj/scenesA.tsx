@@ -57,7 +57,7 @@ export const SceneOrigin: React.FC = () => {
         }}
       />
       {/* "You know the letters" — the 28 letters surface in a slow depth field */}
-      <ArabicLetterField w={L.w} h={L.h} clear={L.landscape ? {w: 520, h: 170} : {w: 400, h: 230}} start={CUE.letters - 8} gather={CUE.where + 18} />
+      <ArabicLetterField w={L.w} h={L.h} clear={L.landscape ? {w: 640, h: 180} : {w: 470, h: 260}} start={CUE.letters - 8} gather={CUE.where + 18} />
       <div style={{position: 'absolute', left: 0, right: 0, top: L.cy - (L.landscape ? 60 : 56) - lift * (L.landscape ? 44 : 60)}}>
         <LightSweepText text="You know the letters." start={8} size={L.landscape ? 86 : 72} duration={36} />
       </div>
