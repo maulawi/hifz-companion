@@ -79,8 +79,11 @@ export const MAKHRAJ_DURATION = f(71.5);
 
 export const MK_TYPE = {
   /** Wide, editorial sans for English titles. */
-  title: {fontFamily: fonts.sans, fontWeight: 500, letterSpacing: '0.32em', textTransform: 'uppercase' as const},
-  body: {fontFamily: fonts.sans, fontWeight: 400},
+  /** Editorial display serif, natural case — no mechanical wide-tracked caps. */
+  title: {fontFamily: fonts.serif, fontWeight: 400, letterSpacing: '0.01em'},
+  /** Small supporting labels: serif italic. */
+  label: {fontFamily: fonts.serif, fontStyle: 'italic' as const, fontWeight: 400, letterSpacing: '0.015em'},
+  body: {fontFamily: fonts.serif, fontWeight: 400},
   serif: {fontFamily: fonts.serif, fontWeight: 400},
   arabic: {fontFamily: '"Amiri", serif', direction: 'rtl' as const},
 } as const;

@@ -82,13 +82,14 @@ type SweepProps = {
   color?: string;
   style?: React.CSSProperties;
   tracking?: [number, number];
+  italic?: boolean;
 };
 
 /**
  * Cinematic title: letters resolve from wide spacing and soft focus while a
  * band of warm light travels across them.
  */
-export const LightSweepText: React.FC<SweepProps> = ({text, start, size, duration = 40, exitStart, color = MK.ivory, style, tracking = [0.62, 0.3]}) => {
+export const LightSweepText: React.FC<SweepProps> = ({text, start, size, duration = 40, exitStart, color = MK.ivory, style, tracking = [0.16, 0.01], italic}) => {
   const frame = useCurrentFrame();
   const p = progress(frame, start, duration, ease.out);
   const sweep = progress(frame, start + 4, duration + 16, ease.inOut);
@@ -96,11 +97,12 @@ export const LightSweepText: React.FC<SweepProps> = ({text, start, size, duratio
   const spacing = `${mix(tracking[0], tracking[1], p)}em`;
   const common: React.CSSProperties = {
     ...MK_TYPE.title,
+    fontStyle: italic ? 'italic' : 'normal',
     fontSize: size,
     letterSpacing: spacing,
     whiteSpace: 'nowrap',
     textAlign: 'center',
-    paddingLeft: spacing, // optical centring of tracked caps
+    paddingLeft: spacing, // optical centring of tracked type
   };
   if (p <= 0) return null;
   return (
@@ -264,8 +266,8 @@ export const MakhrajIcon: React.FC<{size: number; appear: number; glare?: number
 /** Typeset product name (to be replaced by the official logotype when supplied). */
 export const Wordmark: React.FC<{size: number; appear: number; style?: React.CSSProperties}> = ({size, appear, style}) => (
   <div style={{textAlign: 'center', opacity: appear, ...style}}>
-    <div style={{...MK_TYPE.title, fontSize: size, letterSpacing: `${mix(0.7, 0.42, appear)}em`, paddingLeft: '0.42em', color: MK.ivory}}>Makhraj Lab</div>
-    <div style={{...MK_TYPE.title, fontSize: size * 0.3, letterSpacing: '0.5em', paddingLeft: '0.5em', color: MK.gold, marginTop: size * 0.35, opacity: appear}}>by Qurra</div>
+    <div style={{...MK_TYPE.title, fontWeight: 500, fontSize: size * 1.25, letterSpacing: `${mix(0.12, 0.02, appear)}em`, color: MK.ivory, lineHeight: 1}}>Makhraj Lab</div>
+    <div style={{...MK_TYPE.label, fontSize: size * 0.46, color: MK.gold, marginTop: size * 0.32, opacity: appear}}>by Qurra</div>
   </div>
 );
 
@@ -392,5 +394,91 @@ export const VideoPanel: React.FC<VideoPanelProps> = ({take, from, width, x, y, 
         <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 30%)', pointerEvents: 'none'}} />
       </div>
     </>
+  );
+};
+
+// ───────────────────────── Arabic letter field ─────────────────────────
+
+/** The 28 letters of the Arabic alphabet, isolated forms. */
+export const ARABIC_ALPHABET = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'] as const;
+
+type FieldProps = {
+  w: number;
+  h: number;
+  /** Half-size of the clear area kept for the headline. */
+  clear: {w: number; h: number};
+  start: number;
+  /** Frame at which the letters gather to the centre and dissolve. */
+  gather: number;
+};
+
+/**
+ * The letters float in a slow depth field around the headline: near letters are
+ * large and crisp, far ones small and soft; on cue they gather and dissolve.
+ */
+export const ArabicLetterField: React.FC<FieldProps> = ({w, h, clear, start, gather}) => {
+  const frame = useCurrentFrame();
+  const cx = w / 2;
+  const cy = h / 2;
+  const layout = React.useMemo(() => {
+    const pts: Array<{x: number; y: number; z: number}> = [];
+    const minD = Math.sqrt((w * h) / 28) * 0.62;
+    let seed = 7;
+    for (let i = 0; i < ARABIC_ALPHABET.length; i++) {
+      let best = {x: cx, y: cy, z: 0.5};
+      for (let tries = 0; tries < 400; tries++) {
+        const x = 70 + rand(seed++) * (w - 140);
+        const y = 90 + rand(seed++) * (h - 180);
+        if (Math.abs(x - cx) < clear.w && Math.abs(y - cy) < clear.h) continue;
+        if (pts.some((p) => Math.hypot(p.x - x, p.y - y) < minD)) continue;
+        best = {x, y, z: rand(seed++)};
+        break;
+      }
+      pts.push(best);
+    }
+    return pts;
+  }, [w, h, cx, cy, clear.w, clear.h]);
+
+  const g = progress(frame, gather, 34, ease.inOut);
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      {ARABIC_ALPHABET.map((ch, i) => {
+        const p = layout[i];
+        const near = p.z; // 0 far … 1 near
+        const order = (i * 11) % 28; // scattered reveal order
+        const a = progress(frame, start + order * 1.4, 26, ease.out);
+        if (a <= 0) return null;
+        const t = frame - start;
+        const drift = (0.25 + near * 0.6) * t; // parallax: near letters move more
+        const size = mix(54, 150, near);
+        const x0 = p.x + Math.sin(t / 70 + i) * 6 * near;
+        const y0 = p.y - drift * 0.35 + (1 - a) * 24;
+        const x = mix(x0, cx, g * 0.85);
+        const y = mix(y0, cy, g * 0.85);
+        const gold = i % 5 === 0;
+        const op = a * mix(0.22, 0.85, near) * (1 - g);
+        return (
+          <div
+            key={ch}
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              transform: `translate(-50%, -50%) scale(${mix(1, 0.4, g)})`,
+              ...MK_TYPE.arabic,
+              fontSize: size,
+              lineHeight: 1,
+              color: gold ? MK.gold : MK.ivory,
+              opacity: op,
+              filter: `blur(${mix(2.4, 0, near) * (1 - a * 0.3) + (1 - a) * 6 + g * 6}px)`,
+              textShadow: gold ? `0 0 ${18 * near}px ${rgba(MK.gold, 0.45)}` : `0 0 ${14 * near}px rgba(244,240,230,0.18)`,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {ch}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
   );
 };

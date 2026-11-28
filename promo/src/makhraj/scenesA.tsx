@@ -5,7 +5,7 @@ import {ScreenPanel} from '../components/ScreenPanel';
 import {useLayout} from '../lib/layout';
 import {mix, progress} from '../lib/motion';
 import {ease} from '../styles/brand';
-import {GoldPoint, LightSweepText, MakhrajIcon, SoundWave, TRACT_ANCHORS, VideoPanel, VocalTract, Wordmark} from './components';
+import {ArabicLetterField, GoldPoint, LightSweepText, MakhrajIcon, SoundWave, TRACT_ANCHORS, VideoPanel, VocalTract, Wordmark} from './components';
 import {CUE, MK, MK_MARKERS, MK_REGIONS_5, MK_SCREENS, MK_TYPE} from './theme';
 
 /** Visibility window with eased fades (absolute frames). */
@@ -17,9 +17,9 @@ export const DARK_PANEL: React.CSSProperties = {boxShadow: '0 50px 120px -30px r
 export const Caption: React.FC<{text: string; appear: number; size?: number; style?: React.CSSProperties; color?: string}> = ({text, appear, size = 22, style, color = MK.gold}) => (
   <div
     style={{
-      ...MK_TYPE.title,
-      fontSize: size,
-      letterSpacing: `${mix(0.5, 0.34, appear)}em`,
+      ...MK_TYPE.label,
+      fontSize: size * 1.45,
+      letterSpacing: `${mix(0.08, 0.015, appear)}em`,
       color,
       opacity: appear,
       transform: `translateY(${(1 - appear) * 10}px)`,
@@ -56,11 +56,13 @@ export const SceneOrigin: React.FC = () => {
           opacity: 1 - progress(frame, 26, 10),
         }}
       />
-      <div style={{position: 'absolute', left: 0, right: 0, top: L.cy - (L.landscape ? 40 : 36) - lift * (L.landscape ? 50 : 70)}}>
-        <LightSweepText text="You know the letters." start={8} size={L.landscape ? 60 : 46} duration={36} />
+      {/* "You know the letters" — the 28 letters surface in a slow depth field */}
+      <ArabicLetterField w={L.w} h={L.h} clear={L.landscape ? {w: 520, h: 170} : {w: 400, h: 230}} start={CUE.letters - 8} gather={CUE.where + 18} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: L.cy - (L.landscape ? 60 : 56) - lift * (L.landscape ? 44 : 60)}}>
+        <LightSweepText text="You know the letters." start={8} size={L.landscape ? 86 : 72} duration={36} />
       </div>
       <div style={{position: 'absolute', left: 0, right: 0, top: L.cy + (L.landscape ? 40 : 50)}}>
-        <LightSweepText text="Where do they come from?" start={CUE.where - 4} size={L.landscape ? 30 : 26} duration={30} color={MK.gold} tracking={[0.6, 0.36]} />
+        <LightSweepText text="Where do they come from?" start={CUE.where - 4} size={L.landscape ? 46 : 44} duration={30} color={MK.gold} italic />
       </div>
     </AbsoluteFill>
   );
@@ -176,8 +178,8 @@ export const SceneReveal: React.FC = () => {
           right: L.landscape ? L.cx - 520 : 90,
           top: L.cy + (L.landscape ? 170 : 150),
           textAlign: 'center',
-          ...MK_TYPE.body,
-          fontSize: L.landscape ? 28 : 34,
+          ...MK_TYPE.label,
+          fontSize: L.landscape ? 34 : 40,
           lineHeight: 1.45,
           color: MK.ivory,
           opacity: tag * 0.82,
@@ -228,13 +230,13 @@ export const SceneModel: React.FC = () => {
           return (
             <div key={r.name} style={{opacity: a * (i === activeRegion ? 1 : 0.55), transform: `translateX(${(1 - a) * (L.landscape ? -16 : 0)}px)`, marginBottom: L.landscape ? 16 : 10}}>
               <span style={{...MK_TYPE.serif, fontSize: L.landscape ? 40 : 42, color: i === activeRegion ? MK.gold : MK.ivory}}>{r.name}</span>
-              {L.landscape ? <span style={{...MK_TYPE.body, fontSize: 18, color: MK.ivory, opacity: 0.6, marginLeft: 16}}>{r.gloss}</span> : null}
+              {L.landscape ? <span style={{...MK_TYPE.label, fontSize: 22, color: MK.ivory, opacity: 0.6, marginLeft: 16}}>{r.gloss}</span> : null}
             </div>
           );
         })}
       </div>
       <div style={{position: 'absolute', left: L.landscape ? 150 : 0, right: L.landscape ? undefined : 0, top: L.landscape ? 360 : 1360, textAlign: L.landscape ? 'left' : 'center', opacity: pointsOn * (1 - progress(frame, 858, 18))}}>
-        <div style={{...MK_TYPE.body, fontWeight: 400, fontSize: L.landscape ? 180 : 200, lineHeight: 1, color: MK.ivory, letterSpacing: '-0.02em'}}>
+        <div style={{...MK_TYPE.title, fontSize: L.landscape ? 190 : 210, lineHeight: 1, color: MK.ivory, letterSpacing: '-0.01em', fontVariantNumeric: 'lining-nums'}}>
           {Math.min(17, Math.max(1, Math.round(progress(frame, CUE.seventeen, 52, ease.out) * 17)))}
         </div>
         <Caption text="Articulation points" appear={pointsOn} size={L.landscape ? 22 : 26} style={{marginTop: 18}} />

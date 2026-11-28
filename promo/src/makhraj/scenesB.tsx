@@ -346,7 +346,7 @@ export const SceneExperience: React.FC = () => {
       </div>
       {words.map((w, i) => (
         <div key={w.t} style={{position: 'absolute', left: 0, right: 0, top: L.landscape ? L.h - 210 : 1400}}>
-          <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 54 : 56} duration={20} exitStart={i < 2 ? words[i + 1].at - 6 : 1782} tracking={[0.5, 0.26]} />
+          <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 78 : 82} duration={20} exitStart={i < 2 ? words[i + 1].at - 6 : 1782} />
         </div>
       ))}
     </AbsoluteFill>
@@ -377,7 +377,7 @@ export const SceneCTA: React.FC<{url?: string}> = ({url}) => {
       <div style={{position: 'absolute', left: 0, right: 0, top: L.landscape ? L.cy - 130 : L.cy - 230, opacity: 1 - triadOut, transform: `translateY(${-triadOut * 30}px)`}}>
         {triad.map((w) => (
           <div key={w.t} style={{marginBottom: L.landscape ? 14 : 26}}>
-            <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 58 : 64} duration={22} tracking={[0.5, 0.3]} />
+            <LightSweepText text={w.t} start={w.at - 4} size={L.landscape ? 80 : 90} duration={22} />
           </div>
         ))}
       </div>
@@ -408,7 +408,7 @@ export const SceneCTA: React.FC<{url?: string}> = ({url}) => {
       {/* Link area — filled from the `url` prop; left clean until a URL is supplied */}
       <div style={{position: 'absolute', left: 0, right: 0, top: L.landscape ? 760 : 1340, textAlign: 'center', opacity: link}}>
         <div style={{width: 80, height: 1, background: MK.gold, margin: '0 auto 26px', opacity: 0.7}} />
-        {url ? <div style={{...MK_TYPE.title, fontSize: L.landscape ? 24 : 28, letterSpacing: '0.18em', color: MK.gold}}>{url}</div> : null}
+        {url ? <div style={{...MK_TYPE.label, fontSize: L.landscape ? 30 : 34, color: MK.gold}}>{url}</div> : null}
       </div>
     </AbsoluteFill>
   );
